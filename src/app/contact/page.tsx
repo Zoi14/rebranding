@@ -1,6 +1,6 @@
-// FILE: src/app/contact/page.tsx
 import type { Metadata } from "next";
-import ContactForm from "../../components/ContactForm"; // relative import
+import { Suspense } from "react";
+import ContactForm from "../../components/ContactForm";
 
 export const metadata: Metadata = {
   title: "Επικοινωνία",
@@ -8,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <ContactForm />;
+  return (
+    <Suspense fallback={<div style={{ padding: 40 }}>Φόρτωση...</div>}>
+      <ContactForm />
+    </Suspense>
+  );
 }
