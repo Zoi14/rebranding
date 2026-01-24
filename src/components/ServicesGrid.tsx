@@ -33,82 +33,33 @@ function ServiceCard({
   onToggle: () => void;
   children?: React.ReactNode;
 }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-
-  const sx = useSpring(mx, { stiffness: 160, damping: 18 });
-  const sy = useSpring(my, { stiffness: 160, damping: 18 });
-
-  const rotateY = useTransform(sx, [-0.5, 0.5], [-10, 10]);
-  const rotateX = useTransform(sy, [-0.5, 0.5], [10, -10]);
-
-  const glowX = useTransform(sx, [-0.5, 0.5], ["35%", "65%"]);
-  const glowY = useTransform(sy, [-0.5, 0.5], ["30%", "70%"]);
-
-  function onMove(e: React.MouseEvent) {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    mx.set(px);
-    my.set(py);
-  }
-
-  function onLeave() {
-    mx.set(0);
-    my.set(0);
-  }
-
   return (
-    <div style={{ perspective: 1200 }}>
-      <motion.div
-        ref={ref}
-        onMouseMove={onMove}
-        onMouseLeave={onLeave}
-        onClick={onToggle}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") onToggle();
-        }}
-        aria-expanded={isOpen}
-        className="card tile relative overflow-hidden"
+    <motion.div
+      onClick={onToggle}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") onToggle();
+      }}
+      aria-expanded={isOpen}
+      className="card tile relative overflow-hidden"
+      style={{
+        cursor: "pointer",
+      }}
+      whileHover={{ scale: 1.02, y: -4 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+    >
+      {/* Light mode subtle glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300"
         style={{
-          cursor: "pointer",
-          rotateX,
-          rotateY,
-          transformStyle: "preserve-3d",
+          background: `radial-gradient(circle at 50% 50%, rgba(37,99,235,.04), transparent 70%)`,
         }}
-        whileHover={{ scale: 1.01 }}
-        transition={{ duration: 0.15 }}
-      >
-        {/* moving highlight */}
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-40"
-          style={{
-            background: useTransform([glowX, glowY], ([x, y]) => {
-              return `radial-gradient(420px circle at ${x} ${y}, rgba(255,255,255,.12), transparent 55%)`;
-            }),
-          }}
-        />
+      />
 
-        {/* subtle border glow */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            boxShadow:
-              "inset 0 0 0 1px color-mix(in srgb, var(--border) 80%, transparent)",
-            opacity: 0.9,
-          }}
-        />
-
-        {/* content lifted a bit */}
-        <div style={{ transform: "translateZ(18px)" }} className="relative">
+      {/* content */}
+      <div className="relative">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h3 className="text-lg font-semibold">{s.title}</h3>
@@ -150,7 +101,6 @@ function ServiceCard({
           {children}
         </div>
       </motion.div>
-    </div>
   );
 }
 
@@ -305,7 +255,6 @@ export default function ServicesGrid() {
                         transition={{ duration: 0.22 }}
                         className="overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
-                        style={{ transform: "translateZ(14px)" }}
                       >
                         <div className="mt-5 space-y-4">
                           <div>

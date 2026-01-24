@@ -13,13 +13,23 @@ const config: Config = {
         display: ["var(--font-display)", "var(--font-sans)", "sans-serif"],
       },
       colors: {
-        // Muted premium wine / oxblood (calmer than vivid red)
+        // Premium Electric Blue (2026 Light Mode)
         brand: {
-          300: "#f3a6ac", // blush
-          400: "#e77780", // dusty rose
-          500: "#c83d49", // wine red (primary)
-          600: "#a72d37", // oxblood
-          700: "#7f2028", // deep oxblood
+          300: "#60A5FA", // light blue
+          400: "#3B82F6", // blue
+          500: "#2563EB", // electric blue (primary)
+          600: "#1D4ED8", // deep blue
+          700: "#1E40AF", // navy blue
+        },
+        // Clean backgrounds
+        bg: {
+          DEFAULT: "#FFFFFF",
+          subtle: "#FAFAF9",
+        },
+        // Typography colors
+        text: {
+          DEFAULT: "#0F172A", // deep charcoal
+          muted: "rgba(15,23,42,.65)",
         },
       },
     },

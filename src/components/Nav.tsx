@@ -65,16 +65,16 @@ function MenuItem({
       aria-current={active ? "page" : undefined}
       className="group flex items-center justify-between py-5 border-b"
       style={{
-        borderColor: "rgba(255,255,255,.10)",
+        borderColor: "rgba(15,23,42,.08)",
         textDecoration: "none",
       }}
     >
       <span
-        className="text-3xl sm:text-4xl font-semibold tracking-tight"
+        className="text-3xl sm:text-4xl font-bold tracking-tight"
         style={{
-          color: active ? "rgba(255,255,255,.98)" : "rgba(255,255,255,.92)",
+          color: active ? "#0F172A" : "rgba(15,23,42,.85)",
           textTransform: "uppercase",
-          letterSpacing: "-0.01em",
+          letterSpacing: "-0.02em",
         }}
       >
         {label}
@@ -82,10 +82,10 @@ function MenuItem({
 
       <span
         aria-hidden
-        className="text-xl opacity-70 group-hover:opacity-100 transition-opacity"
-        style={{ color: "rgba(245,245,245,.62)" }}
+        className="text-xl opacity-60 group-hover:opacity-100 transition-opacity"
+        style={{ color: "#2563EB" }}
       >
-        ↓
+        →
       </span>
     </Link>
   );
@@ -116,50 +116,25 @@ export default function Nav() {
 
   useFocusTrap(drawerRef, open, () => setOpen(false));
 
-  // ===== Scroll-based header feel (every scroll) =====
+  // ===== Scroll-based header with Glassmorphism =====
   const { scrollY } = useScroll();
   const headerBg = useTransform(
     scrollY,
     [0, 120],
-    ["rgba(0,0,0,.55)", "rgba(0,0,0,.78)"]
+    ["rgba(255,255,255,.70)", "rgba(255,255,255,.85)"]
   );
-  const headerBlur = useTransform(scrollY, [0, 120], ["blur(8px)", "blur(12px)"]);
-  const headerHeight = useTransform(scrollY, [0, 120], [56, 50]); // px
+  const headerBlur = useTransform(scrollY, [0, 120], ["blur(12px)", "blur(16px)"]);
+  const headerHeight = useTransform(scrollY, [0, 120], [64, 56]); // px
   const headerY = useTransform(scrollY, [0, 120], [0, -2]);
-
-  // ===== 3D tilt on hover for the top bar =====
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const sx = useSpring(mx, { stiffness: 160, damping: 20 });
-  const sy = useSpring(my, { stiffness: 160, damping: 20 });
-
-  const rotateY = useTransform(sx, [-0.5, 0.5], [-6, 6]);
-  const rotateX = useTransform(sy, [-0.5, 0.5], [5, -5]);
-
-  function onMove(e: React.MouseEvent) {
-    const el = topRef.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    mx.set(px);
-    my.set(py);
-  }
-  function onLeave() {
-    mx.set(0);
-    my.set(0);
-  }
 
   return (
     <header className="sticky top-0 z-50">
-      {/* top bar */}
+      {/* Glassmorphism top bar */}
       <motion.div
         ref={topRef}
-        onMouseMove={onMove}
-        onMouseLeave={onLeave}
-        className="border-b"
+        className="border-b shadow-sm"
         style={{
-          borderColor: "rgba(255,255,255,.10)",
+          borderColor: "rgba(15,23,42,.08)",
           background: headerBg,
           backdropFilter: headerBlur as any,
           y: headerY,
@@ -169,22 +144,13 @@ export default function Nav() {
           className="mx-auto max-w-6xl px-4 flex items-center justify-between"
           style={{
             height: headerHeight,
-            perspective: 1000,
           }}
         >
-          <motion.div
-            style={{
-              rotateX,
-              rotateY,
-              transformStyle: "preserve-3d",
-            }}
-            className="flex w-full items-center justify-between"
-          >
+          <div className="flex w-full items-center justify-between">
             {/* BRAND */}
             <Link
               href="/"
               className="inline-flex items-center gap-2"
-              style={{ transform: "translateZ(10px)" }}
             >
               <Image
                 src="/img/logo.png"
@@ -194,22 +160,27 @@ export default function Nav() {
                 priority
                 className="rounded-sm"
               />
-              <span className="hidden sm:inline text-base font-semibold text-white font-display">
+              <span className="hidden sm:inline text-base font-semibold font-display" style={{ color: "#0F172A" }}>
                 Rebranding
               </span>
-              <span className="hidden sm:inline text-neutral-400 text-sm">— Ζωή</span>
+              <span className="hidden sm:inline text-sm" style={{ color: "rgba(15,23,42,.65)" }}>— Ζωή</span>
             </Link>
 
             {/* Desktop minimal */}
             <div
-              className="hidden md:flex items-center gap-6 text-sm"
-              style={{ color: "rgba(245,245,245,.62)", transform: "translateZ(10px)" }}
+              className="hidden md:flex items-center gap-6 text-sm font-medium"
+              style={{ color: "rgba(15,23,42,.65)" }}
             >
               {items.map((it) => (
                 <Link
                   key={it.href}
                   href={it.href}
-                  className="hover:text-white transition-colors"
+                  className="transition-colors"
+                  style={{
+                    color: "rgba(15,23,42,.75)",
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#0F172A"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "rgba(15,23,42,.75)"}
                 >
                   {it.label}
                 </Link>
@@ -227,12 +198,11 @@ export default function Nav() {
               onClick={() => setOpen((v) => !v)}
               className="inline-flex items-center gap-3"
               style={{
-                color: "rgba(255,255,255,.96)",
+                color: "#0F172A",
                 letterSpacing: ".14em",
                 textTransform: "uppercase",
                 fontSize: ".78rem",
                 fontWeight: 800,
-                transform: "translateZ(10px)",
               }}
             >
               <span className="hidden sm:inline">{open ? "Close" : "Menu"}</span>
@@ -240,8 +210,8 @@ export default function Nav() {
               <span
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border"
                 style={{
-                  borderColor: "rgba(255,255,255,.22)",
-                  background: "rgba(255,255,255,.03)",
+                  borderColor: "rgba(15,23,42,.18)",
+                  background: "rgba(15,23,42,.03)",
                 }}
                 aria-hidden
               >
@@ -259,11 +229,11 @@ export default function Nav() {
                 </span>
               </span>
             </button>
-          </motion.div>
+          </div>
         </motion.nav>
       </motion.div>
 
-      {/* Fullscreen overlay menu */}
+      {/* Fullscreen overlay menu - Light Mode */}
       <AnimatePresence>
         {open && (
           <motion.aside
@@ -277,7 +247,7 @@ export default function Nav() {
             aria-modal="true"
             className="fixed inset-0"
             style={{
-              backgroundColor: "#070707",
+              backgroundColor: "#FFFFFF",
               zIndex: 2147483647,
               opacity: 1,
               isolation: "isolate",
@@ -287,7 +257,7 @@ export default function Nav() {
               className="absolute inset-0"
               onClick={() => setOpen(false)}
               aria-hidden
-              style={{ backgroundColor: "#070707", opacity: 1 }}
+              style={{ backgroundColor: "#FFFFFF", opacity: 1 }}
             />
 
             <motion.div
@@ -297,14 +267,14 @@ export default function Nav() {
               onClick={(e) => e.stopPropagation()}
               className="relative h-full"
               style={{
-                backgroundColor: "#070707",
+                backgroundColor: "#FFFFFF",
                 zIndex: 1,
                 opacity: 1,
                 outline: "none",
               }}
             >
               {/* top row */}
-              <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
+              <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between border-b" style={{ borderColor: "rgba(15,23,42,.08)" }}>
                 <div className="flex items-center gap-3">
                   <Image
                     src="/img/logo.png"
@@ -319,7 +289,7 @@ export default function Nav() {
                   onClick={() => setOpen(false)}
                   className="inline-flex items-center gap-2"
                   style={{
-                    color: "rgba(255,255,255,.96)",
+                    color: "#0F172A",
                     letterSpacing: ".12em",
                     textTransform: "uppercase",
                     fontSize: ".78rem",
@@ -331,8 +301,8 @@ export default function Nav() {
                   <span
                     className="inline-flex h-10 w-10 items-center justify-center rounded-full border"
                     style={{
-                      borderColor: "rgba(255,255,255,.18)",
-                      background: "rgba(255,255,255,.03)",
+                      borderColor: "rgba(15,23,42,.18)",
+                      background: "rgba(15,23,42,.03)",
                     }}
                     aria-hidden
                   >
@@ -378,7 +348,7 @@ export default function Nav() {
                     <motion.p
                       variants={itemVar}
                       className="mt-8 text-xs"
-                      style={{ color: "rgba(245,245,245,.62)" }}
+                      style={{ color: "rgba(15,23,42,.65)" }}
                     >
                       Content • Social Media • Web Styling
                     </motion.p>
