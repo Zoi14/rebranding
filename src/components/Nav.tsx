@@ -47,10 +47,12 @@ function MenuItem({
   href,
   label,
   onClick,
+  index,
 }: {
   href: string;
   label: string;
   onClick: () => void;
+  index: number;
 }) {
   const pathname = usePathname();
   const active = useMemo(
@@ -63,30 +65,97 @@ function MenuItem({
       href={href}
       onClick={onClick}
       aria-current={active ? "page" : undefined}
-      className="group flex items-center justify-between py-5 border-b"
+      className="group relative flex items-center justify-between py-8 border-b overflow-hidden"
       style={{
-        borderColor: "rgba(255,255,255,.10)",
+        borderColor: "rgba(255,255,255,.08)",
         textDecoration: "none",
       }}
     >
+      {/* Gradient background on hover */}
       <span
-        className="text-3xl sm:text-4xl font-semibold tracking-tight"
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         style={{
-          color: active ? "rgba(255,255,255,.98)" : "rgba(255,255,255,.92)",
-          textTransform: "uppercase",
-          letterSpacing: "-0.01em",
+          background: "linear-gradient(90deg, rgba(255,106,26,.05) 0%, transparent 100%)",
+        }}
+      />
+
+      {/* Index number */}
+      <span
+        className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:translate-x-0 -translate-x-4"
+        style={{
+          fontSize: "5rem",
+          fontWeight: 900,
+          color: "rgba(255,106,26,.08)",
+          lineHeight: 1,
+          zIndex: 0,
         }}
       >
-        {label}
+        {String(index + 1).padStart(2, "0")}
       </span>
 
+      <div className="relative z-10 flex flex-col gap-2">
+        <span
+          className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight transition-all duration-300 group-hover:translate-x-3"
+          style={{
+            color: active ? "#ff6a1a" : "rgba(255,255,255,.95)",
+            textTransform: "uppercase",
+            letterSpacing: "-0.02em",
+            textShadow: active ? "0 0 30px rgba(255,106,26,.3)" : "none",
+          }}
+        >
+          {label}
+        </span>
+
+        {/* Subtitle hint */}
+        <span
+          className="text-xs uppercase tracking-widest opacity-0 group-hover:opacity-60 transition-all duration-300 -translate-y-2 group-hover:translate-y-0 group-hover:translate-x-3"
+          style={{ color: "rgba(245,245,245,.5)", letterSpacing: ".2em" }}
+        >
+          {href === "/" ? "Home Page" : href === "/services" ? "Our Services" : "Get In Touch"}
+        </span>
+      </div>
+
+      {/* Animated arrow */}
+      <div className="relative z-10 flex items-center gap-4">
+        {active && (
+          <span
+            className="hidden sm:inline text-xs uppercase tracking-widest px-3 py-1 rounded-full"
+            style={{
+              background: "rgba(255,106,26,.15)",
+              border: "1px solid rgba(255,106,26,.3)",
+              color: "#ff6a1a",
+              letterSpacing: ".15em",
+            }}
+          >
+            Active
+          </span>
+        )}
+
+        <span
+          className="inline-flex items-center justify-center w-14 h-14 rounded-full border-2 transition-all duration-300 group-hover:scale-110 group-hover:rotate-12"
+          style={{
+            borderColor: active ? "#ff6a1a" : "rgba(255,255,255,.15)",
+            background: active ? "rgba(255,106,26,.1)" : "rgba(255,255,255,.03)",
+          }}
+        >
+          <span
+            aria-hidden
+            className="text-2xl transition-transform duration-300 group-hover:translate-x-1"
+            style={{ color: active ? "#ff6a1a" : "rgba(245,245,245,.7)" }}
+          >
+            →
+          </span>
+        </span>
+      </div>
+
+      {/* Bottom gradient line */}
       <span
-        aria-hidden
-        className="text-xl opacity-70 group-hover:opacity-100 transition-opacity"
-        style={{ color: "rgba(245,245,245,.62)" }}
-      >
-        ↓
-      </span>
+        className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-transparent via-brand-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{
+          width: "100%",
+          background: "linear-gradient(90deg, transparent, #ff6a1a, transparent)",
+        }}
+      />
     </Link>
   );
 }
@@ -288,7 +357,32 @@ export default function Nav() {
               onClick={() => setOpen(false)}
               aria-hidden
               style={{ backgroundColor: "#070707", opacity: 1 }}
-            />
+            >
+              {/* Decorative gradient orbs */}
+              <div
+                className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl opacity-20"
+                style={{
+                  background: "radial-gradient(circle, #ff6a1a 0%, transparent 70%)",
+                  animation: "pulse 8s ease-in-out infinite",
+                }}
+              />
+              <div
+                className="absolute bottom-0 left-0 w-96 h-96 rounded-full blur-3xl opacity-10"
+                style={{
+                  background: "radial-gradient(circle, #ff6a1a 0%, transparent 70%)",
+                  animation: "pulse 8s ease-in-out infinite 4s",
+                }}
+              />
+              {/* Grid pattern overlay */}
+              <div
+                className="absolute inset-0 opacity-[0.02]"
+                style={{
+                  backgroundImage: `linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px),
+                                   linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)`,
+                  backgroundSize: "50px 50px",
+                }}
+              />
+            </div>
 
             <motion.div
               variants={panel}
@@ -303,21 +397,32 @@ export default function Nav() {
                 outline: "none",
               }}
             >
-              {/* top row */}
-              <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Image
-                    src="/img/logo.png"
-                    alt="Rebranding logo"
-                    width={100}
-                    height={70}
-                    className="rounded-sm"
-                  />
+              {/* Enhanced top row */}
+              <div className="mx-auto max-w-6xl px-4 h-20 flex items-center justify-between border-b" style={{ borderColor: "rgba(255,255,255,.06)" }}>
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <div className="absolute inset-0 blur-xl opacity-50" style={{ background: "#ff6a1a" }} />
+                    <Image
+                      src="/img/logo.png"
+                      alt="Rebranding logo"
+                      width={100}
+                      height={70}
+                      className="rounded-sm relative z-10"
+                    />
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold" style={{ color: "rgba(255,255,255,.95)" }}>
+                      Rebranding
+                    </div>
+                    <div className="text-xs" style={{ color: "rgba(245,245,245,.5)" }}>
+                      by Ζωή
+                    </div>
+                  </div>
                 </div>
 
                 <button
                   onClick={() => setOpen(false)}
-                  className="inline-flex items-center gap-2"
+                  className="group inline-flex items-center gap-3 transition-all duration-300 hover:gap-4"
                   style={{
                     color: "rgba(255,255,255,.96)",
                     letterSpacing: ".12em",
@@ -327,61 +432,98 @@ export default function Nav() {
                   }}
                   aria-label="Κλείσιμο"
                 >
-                  <span>Close</span>
+                  <span className="hidden sm:inline">Close</span>
                   <span
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border"
+                    className="inline-flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all duration-300 group-hover:rotate-90 group-hover:border-brand-500"
                     style={{
-                      borderColor: "rgba(255,255,255,.18)",
-                      background: "rgba(255,255,255,.03)",
+                      borderColor: "rgba(255,255,255,.2)",
+                      background: "rgba(255,255,255,.05)",
                     }}
                     aria-hidden
                   >
-                    ✕
+                    <span className="text-lg">✕</span>
                   </span>
                 </button>
               </div>
 
               {/* items */}
               <div className="mx-auto max-w-6xl px-4">
-                <div className="max-w-xl">
+                <div className="max-w-4xl">
                   {/* ✅ stagger every time menu opens */}
-                  <motion.div variants={list} initial="hidden" animate="show">
-                    {items.map((it) => (
+                  <motion.div variants={list} initial="hidden" animate="show" className="mt-8">
+                    {items.map((it, idx) => (
                       <motion.div key={it.href} variants={itemVar}>
                         <MenuItem
                           href={it.href}
                           label={it.label}
                           onClick={() => setOpen(false)}
+                          index={idx}
                         />
                       </motion.div>
                     ))}
 
-                    <motion.div variants={itemVar} className="mt-6 flex flex-wrap gap-3">
-                      <a
-                        href="https://instagram.com/rebranding_byzoe"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="btn-jesper"
-                      >
-                        Instagram <span className="arrow">→</span>
-                      </a>
+                    {/* Enhanced CTA Section */}
+                    <motion.div variants={itemVar} className="mt-12 pt-8 border-t" style={{ borderColor: "rgba(255,255,255,.06)" }}>
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <Link
+                          href="/contact"
+                          className="group relative overflow-hidden flex-1 px-8 py-5 rounded-2xl transition-all duration-300 hover:scale-[1.02]"
+                          onClick={() => setOpen(false)}
+                          style={{
+                            background: "linear-gradient(135deg, rgba(255,106,26,.18) 0%, rgba(255,106,26,.08) 100%)",
+                            border: "2px solid rgba(255,106,26,.4)",
+                          }}
+                        >
+                          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-10 transition-opacity duration-500" style={{ transform: "translateX(-100%)", animation: "shimmer 2s infinite" }} />
+                          <div className="relative flex items-center justify-between">
+                            <div>
+                              <div className="text-xs uppercase tracking-widest mb-1" style={{ color: "rgba(255,106,26,.8)", letterSpacing: ".2em" }}>
+                                Get Started
+                              </div>
+                              <div className="text-lg font-bold" style={{ color: "#ff6a1a" }}>
+                                Ζήτησε προσφορά
+                              </div>
+                            </div>
+                            <span className="text-3xl transition-transform duration-300 group-hover:translate-x-2 group-hover:scale-110" style={{ color: "#ff6a1a" }}>
+                              →
+                            </span>
+                          </div>
+                        </Link>
 
-                      <Link
-                        href="/contact"
-                        className="btn-jesper primary"
-                        onClick={() => setOpen(false)}
-                      >
-                        Ζήτησε προσφορά <span className="arrow">→</span>
-                      </Link>
+                        <a
+                          href="https://instagram.com/rebranding_byzoe"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="group flex items-center justify-center gap-3 px-6 py-5 rounded-2xl transition-all duration-300 hover:scale-[1.02]"
+                          style={{
+                            border: "2px solid rgba(255,255,255,.15)",
+                            background: "rgba(255,255,255,.03)",
+                          }}
+                        >
+                          <span className="text-sm font-semibold uppercase tracking-wide" style={{ color: "rgba(245,245,245,.9)" }}>
+                            Instagram
+                          </span>
+                          <span className="text-xl transition-transform duration-300 group-hover:translate-x-1">
+                            →
+                          </span>
+                        </a>
+                      </div>
                     </motion.div>
 
-                    <motion.p
+                    {/* Enhanced footer info */}
+                    <motion.div
                       variants={itemVar}
-                      className="mt-8 text-xs"
-                      style={{ color: "rgba(245,245,245,.62)" }}
+                      className="mt-12 flex items-center justify-between"
                     >
-                      Content • Social Media • Web Styling
-                    </motion.p>
+                      <p className="text-xs uppercase tracking-widest" style={{ color: "rgba(245,245,245,.4)", letterSpacing: ".2em" }}>
+                        Content • Social Media • Web Styling
+                      </p>
+                      <div className="flex gap-2">
+                        <span className="w-2 h-2 rounded-full" style={{ background: "#ff6a1a" }} />
+                        <span className="w-2 h-2 rounded-full" style={{ background: "rgba(255,106,26,.5)" }} />
+                        <span className="w-2 h-2 rounded-full" style={{ background: "rgba(255,106,26,.25)" }} />
+                      </div>
+                    </motion.div>
                   </motion.div>
                 </div>
               </div>
