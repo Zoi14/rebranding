@@ -75,7 +75,7 @@ export default function HeroBanner({
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(10,10,10,.65) 0%, rgba(10,10,10,.78) 55%, rgba(10,10,10,.92) 100%)",
+              "linear-gradient(180deg, rgba(255,255,255,.75) 0%, rgba(255,255,255,.85) 55%, rgba(255,255,255,.95) 100%)",
           }}
         />
       </div>
@@ -106,7 +106,7 @@ export default function HeroBanner({
             {/* back layers (depth) */}
             <motion.h1
               aria-hidden
-              className="h1 absolute inset-0 select-none opacity-30"
+              className="h1 absolute inset-0 select-none opacity-30 text-slate-900"
               style={{
                 transform: "translateZ(-40px) translateY(8px)",
                 filter: "blur(0.6px)",
@@ -120,7 +120,7 @@ export default function HeroBanner({
 
             <motion.h1
               aria-hidden
-              className="h1 absolute inset-0 select-none opacity-20"
+              className="h1 absolute inset-0 select-none opacity-20 text-slate-900"
               style={{
                 transform: "translateZ(-20px) translateY(4px)",
                 filter: "blur(0.25px)",
@@ -134,7 +134,7 @@ export default function HeroBanner({
 
             {/* front layer */}
             <motion.h1
-              className="h1 relative"
+              className="h1 relative text-slate-900"
               style={{ transform: "translateZ(25px)" }}
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
