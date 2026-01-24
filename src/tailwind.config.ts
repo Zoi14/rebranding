@@ -13,13 +13,17 @@ const config: Config = {
         display: ["var(--font-display)", "var(--font-sans)", "sans-serif"],
       },
       colors: {
-        // Muted premium wine / oxblood (calmer than vivid red)
+        // Light Mode theme colors
+        background: "#ffffff",
+        foreground: "#0f172a",
+
+        // Orange accent (matching globals.css)
         brand: {
-          300: "#f3a6ac", // blush
-          400: "#e77780", // dusty rose
-          500: "#c83d49", // wine red (primary)
-          600: "#a72d37", // oxblood
-          700: "#7f2028", // deep oxblood
+          300: "#ffb38a",
+          400: "#ff8a4a",
+          500: "#ff6a1a", // main orange
+          600: "#e45510",
+          700: "#b6400c",
         },
       },
     },

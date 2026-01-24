@@ -13,7 +13,7 @@ export default function ActiveLink({ href, exact = false, className, children }:
       href={href}
       className={[
         "px-3 py-2 rounded-xl transition",
-        isActive ? "bg-neutral-800 text-white" : "text-neutral-300 hover:text-white hover:bg-neutral-800",
+        isActive ? "bg-slate-100 text-slate-900 font-semibold" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50",
         className ?? "",
       ].join(" ")}
       aria-current={isActive ? "page" : undefined}

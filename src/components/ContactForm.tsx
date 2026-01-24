@@ -99,7 +99,7 @@ export default function ContactForm() {
           <div>
             <label htmlFor="service">Υπηρεσία (optional)</label>
             <select
-  className="select-dark w-full rounded-xl border border-white/10 bg-zinc-900 text-white px-4 py-3"
+  className="select-dark w-full rounded-xl border border-slate-200 bg-white text-slate-900 px-4 py-3"
   id="service"
   name="service"
   value={form.service}

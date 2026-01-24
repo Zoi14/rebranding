@@ -194,22 +194,22 @@ export default function Nav() {
                 priority
                 className="rounded-sm"
               />
-              <span className="hidden sm:inline text-base font-semibold text-white font-display">
+              <span className="hidden sm:inline text-base font-semibold text-slate-900 font-display">
                 Rebranding
               </span>
-              <span className="hidden sm:inline text-neutral-400 text-sm">— Ζωή</span>
+              <span className="hidden sm:inline text-slate-500 text-sm">— Ζωή</span>
             </Link>
 
             {/* Desktop minimal */}
             <div
               className="hidden md:flex items-center gap-6 text-sm"
-              style={{ color: "rgba(245,245,245,.62)", transform: "translateZ(10px)" }}
+              style={{ color: "rgba(15,23,42,.65)", transform: "translateZ(10px)" }}
             >
               {items.map((it) => (
                 <Link
                   key={it.href}
                   href={it.href}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-slate-900 transition-colors"
                 >
                   {it.label}
                 </Link>
