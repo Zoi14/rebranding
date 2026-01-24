@@ -1,13 +1,7 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from "framer-motion";
+import { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import Reveal from "@/components/Reveal";
 
 type Service = {
@@ -33,124 +27,62 @@ function ServiceCard({
   onToggle: () => void;
   children?: React.ReactNode;
 }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-
-  const sx = useSpring(mx, { stiffness: 160, damping: 18 });
-  const sy = useSpring(my, { stiffness: 160, damping: 18 });
-
-  const rotateY = useTransform(sx, [-0.5, 0.5], [-10, 10]);
-  const rotateX = useTransform(sy, [-0.5, 0.5], [10, -10]);
-
-  const glowX = useTransform(sx, [-0.5, 0.5], ["35%", "65%"]);
-  const glowY = useTransform(sy, [-0.5, 0.5], ["30%", "70%"]);
-
-  function onMove(e: React.MouseEvent) {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    mx.set(px);
-    my.set(py);
-  }
-
-  function onLeave() {
-    mx.set(0);
-    my.set(0);
-  }
-
   return (
-    <div style={{ perspective: 1200 }}>
-      <motion.div
-        ref={ref}
-        onMouseMove={onMove}
-        onMouseLeave={onLeave}
-        onClick={onToggle}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") onToggle();
-        }}
-        aria-expanded={isOpen}
-        className="card tile relative overflow-hidden"
-        style={{
-          cursor: "pointer",
-          rotateX,
-          rotateY,
-          transformStyle: "preserve-3d",
-        }}
-        whileHover={{ scale: 1.01 }}
-        transition={{ duration: 0.15 }}
-      >
-        {/* moving highlight */}
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-40"
-          style={{
-            background: useTransform([glowX, glowY], ([x, y]) => {
-              return `radial-gradient(420px circle at ${x} ${y}, rgba(255,255,255,.12), transparent 55%)`;
-            }),
-          }}
-        />
-
-        {/* subtle border glow */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            boxShadow:
-              "inset 0 0 0 1px color-mix(in srgb, var(--border) 80%, transparent)",
-            opacity: 0.9,
-          }}
-        />
-
-        {/* content lifted a bit */}
-        <div style={{ transform: "translateZ(18px)" }} className="relative">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h3 className="text-lg font-semibold">{s.title}</h3>
-              <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-                {s.desc}
-              </p>
-            </div>
-
-            <motion.span
-              className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-lg border"
-              style={{
-                borderColor: "var(--border)",
-                background:
-                  "color-mix(in srgb, var(--surface-strong) 80%, transparent)",
-              }}
-              aria-hidden
-              animate={{ rotate: isOpen ? 180 : 0, scale: isOpen ? 1.03 : 1 }}
-              transition={{ duration: 0.2 }}
-            >
-              {isOpen ? "−" : "+"}
-            </motion.span>
+    <motion.div
+      onClick={onToggle}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") onToggle();
+      }}
+      aria-expanded={isOpen}
+      className="card tile relative overflow-hidden"
+      style={{ cursor: "pointer" }}
+      whileHover={{ scale: 1.01 }}
+      transition={{ duration: 0.15 }}
+    >
+      <div className="relative">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 className="text-lg font-semibold">{s.title}</h3>
+            <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
+              {s.desc}
+            </p>
           </div>
 
-          <div className="mt-4 divider" />
-
-          <ul className="mt-4 space-y-2 text-sm">
-            {s.bullets.map((b) => (
-              <li key={b} className="flex items-start gap-2">
-                <span
-                  aria-hidden
-                  className="mt-1 h-1.5 w-1.5 rounded-full"
-                  style={{ background: "var(--brand-500)" }}
-                />
-                <span>{b}</span>
-              </li>
-            ))}
-          </ul>
-
-          {children}
+          <motion.span
+            className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-lg border"
+            style={{
+              borderColor: "var(--border)",
+              background:
+                "color-mix(in srgb, var(--surface-strong) 80%, transparent)",
+            }}
+            aria-hidden
+            animate={{ rotate: isOpen ? 180 : 0, scale: isOpen ? 1.03 : 1 }}
+            transition={{ duration: 0.2 }}
+          >
+            {isOpen ? "−" : "+"}
+          </motion.span>
         </div>
-      </motion.div>
-    </div>
+
+        <div className="mt-4 divider" />
+
+        <ul className="mt-4 space-y-2 text-sm">
+          {s.bullets.map((b) => (
+            <li key={b} className="flex items-start gap-2">
+              <span
+                aria-hidden
+                className="mt-1 h-1.5 w-1.5 rounded-full"
+                style={{ background: "var(--brand-500)" }}
+              />
+              <span>{b}</span>
+            </li>
+          ))}
+        </ul>
+
+        {children}
+      </div>
+    </motion.div>
   );
 }
 
@@ -305,7 +237,6 @@ export default function ServicesGrid() {
                         transition={{ duration: 0.22 }}
                         className="overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
-                        style={{ transform: "translateZ(14px)" }}
                       >
                         <div className="mt-5 space-y-4">
                           <div>

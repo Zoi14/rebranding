@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 
 type Props = {
   kicker?: string;
@@ -19,37 +18,6 @@ export default function HeroBanner({
   imageUrl = "/img/hero.PNG",
   videoUrl,
 }: Props) {
-  const wrapRef = useRef<HTMLDivElement | null>(null);
-
-  // mouse-based parallax
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const sx = useSpring(mx, { stiffness: 160, damping: 20 });
-  const sy = useSpring(my, { stiffness: 160, damping: 20 });
-
-  // subtle 3D rotation for the whole content block
-  const rotateY = useTransform(sx, [-0.5, 0.5], [-10, 10]);
-  const rotateX = useTransform(sy, [-0.5, 0.5], [10, -10]);
-
-  // little drifting glow behind
-  const glowX = useTransform(sx, [-0.5, 0.5], ["-8%", "8%"]);
-  const glowY = useTransform(sy, [-0.5, 0.5], ["-6%", "6%"]);
-
-  function onMove(e: React.MouseEvent) {
-    const el = wrapRef.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    mx.set(px);
-    my.set(py);
-  }
-
-  function onLeave() {
-    mx.set(0);
-    my.set(0);
-  }
-
   return (
     <section className="relative min-h-[86vh] w-full overflow-hidden">
       {/* Background */}
@@ -81,85 +49,40 @@ export default function HeroBanner({
       </div>
 
       {/* Content */}
-      <div
-        ref={wrapRef}
-        onMouseMove={onMove}
-        onMouseLeave={onLeave}
-        className="relative container-page section"
-        style={{ perspective: 1200 }}
-      >
-        <motion.div
-          style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-          className="max-w-3xl"
-        >
-          {/* moving glow blob */}
-          <motion.div
-            aria-hidden
-            style={{ x: glowX, y: glowY }}
-            className="pointer-events-none absolute -left-24 -top-24 h-[320px] w-[320px] rounded-full blur-3xl opacity-25"
-          />
-
-          <p className="kicker">{kicker}</p>
-
-          {/* 3D Title */}
-          <div className="relative mt-3">
-            {/* back layers (depth) */}
-            <motion.h1
-              aria-hidden
-              className="h1 absolute inset-0 select-none opacity-30"
-              style={{
-                transform: "translateZ(-40px) translateY(8px)",
-                filter: "blur(0.6px)",
-              }}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 0.28, y: 0 }}
-              transition={{ duration: 0.55 }}
-            >
-              {title}
-            </motion.h1>
-
-            <motion.h1
-              aria-hidden
-              className="h1 absolute inset-0 select-none opacity-20"
-              style={{
-                transform: "translateZ(-20px) translateY(4px)",
-                filter: "blur(0.25px)",
-              }}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 0.2, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.03 }}
-            >
-              {title}
-            </motion.h1>
-
-            {/* front layer */}
-            <motion.h1
-              className="h1 relative"
-              style={{ transform: "translateZ(25px)" }}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45 }}
-            >
-              {title}
-            </motion.h1>
-          </div>
-
+      <div className="relative container-page section">
+        <div className="max-w-3xl">
           <motion.p
-            className="lead mt-5"
-            style={{ transform: "translateZ(18px)" }}
+            className="kicker"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            {kicker}
+          </motion.p>
+
+          <motion.h1
+            className="h1 mt-3"
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.05 }}
+          >
+            {title}
+          </motion.h1>
+
+          <motion.p
+            className="lead mt-5"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.1 }}
           >
             {subtitle}
           </motion.p>
 
           <motion.div
             className="mt-7 flex flex-wrap gap-3"
-            style={{ transform: "translateZ(18px)" }}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.12 }}
+            transition={{ duration: 0.35, delay: 0.15 }}
           >
             <Link href="/contact" className="btn">
               Ζήτησε προσφορά
@@ -174,7 +97,7 @@ export default function HeroBanner({
               Instagram
             </a>
           </motion.div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

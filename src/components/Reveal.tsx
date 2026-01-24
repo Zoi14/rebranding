@@ -23,10 +23,9 @@ export default function Reveal({ children, className = "", delay = 0, y = 18 }: 
     <motion.div
       ref={ref}
       className={className}
-      // ✅ όταν είναι έξω, γυρνάει πίσω (reset)
-      initial={{ opacity: 0, y, filter: "blur(6px)" }}
-      animate={inView ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y, filter: "blur(6px)" }}
-      transition={{ duration: 0.55, ease: [0.2, 0.8, 0.2, 1], delay }}
+      initial={{ opacity: 0, y }}
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y }}
+      transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1], delay }}
     >
       {children}
     </motion.div>
