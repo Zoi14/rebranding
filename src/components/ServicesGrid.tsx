@@ -82,8 +82,6 @@ function ServiceCard({
           rotateY,
           transformStyle: "preserve-3d",
         }}
-        whileHover={{ scale: 1.01 }}
-        transition={{ duration: 0.15 }}
       >
         {/* moving highlight */}
         <motion.div
@@ -117,7 +115,7 @@ function ServiceCard({
               </p>
             </div>
 
-            <motion.span
+            <span
               className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-lg border"
               style={{
                 borderColor: "var(--border)",
@@ -125,11 +123,9 @@ function ServiceCard({
                   "color-mix(in srgb, var(--surface-strong) 80%, transparent)",
               }}
               aria-hidden
-              animate={{ rotate: isOpen ? 180 : 0, scale: isOpen ? 1.03 : 1 }}
-              transition={{ duration: 0.2 }}
             >
               {isOpen ? "−" : "+"}
-            </motion.span>
+            </span>
           </div>
 
           <div className="mt-4 divider" />
@@ -299,10 +295,14 @@ export default function ServicesGrid() {
                   <AnimatePresence initial={false}>
                     {isOpen && (
                       <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.22 }}
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 25,
+                        }}
                         className="overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
                         style={{ transform: "translateZ(14px)" }}
@@ -349,9 +349,19 @@ export default function ServicesGrid() {
                               Instagram DM <span className="arrow">→</span>
                             </a>
 
-                            <a href="/contact" className="btn-jesper primary">
-                              Ζήτησε προσφορά <span className="arrow">→</span>
-                            </a>
+                            <motion.div
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              transition={{
+                                type: "spring",
+                                stiffness: 400,
+                                damping: 10,
+                              }}
+                            >
+                              <a href="/contact" className="btn-jesper primary">
+                                Ζήτησε προσφορά <span className="arrow">→</span>
+                              </a>
+                            </motion.div>
                           </div>
                         </div>
                       </motion.div>

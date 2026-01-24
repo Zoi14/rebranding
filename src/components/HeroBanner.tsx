@@ -154,16 +154,23 @@ export default function HeroBanner({
             {subtitle}
           </motion.p>
 
-          <motion.div
+          <div
             className="mt-7 flex flex-wrap gap-3"
             style={{ transform: "translateZ(18px)" }}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.12 }}
           >
-            <Link href="/contact" className="btn">
-              Ζήτησε προσφορά
-            </Link>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{
+                type: "spring",
+                stiffness: 400,
+                damping: 10,
+              }}
+            >
+              <Link href="/contact" className="btn">
+                Ζήτησε προσφορά
+              </Link>
+            </motion.div>
 
             <a
               className="btn secondary"
@@ -173,7 +180,7 @@ export default function HeroBanner({
             >
               Instagram
             </a>
-          </motion.div>
+          </div>
         </motion.div>
       </div>
     </section>
