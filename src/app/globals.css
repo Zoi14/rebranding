@@ -8,47 +8,49 @@
    Copy-paste whole file
    ========================================================= */
 
-/* ===== Theme tokens ===== */
+/* ===== 2026 Premium Theme Tokens ===== */
 :root{
   color-scheme: dark;
 
-  /* Jesper: near-black + film grain */
-  --bg: #070707;
-  --surface: rgba(255,255,255,.03);
-  --surface-strong: rgba(255,255,255,.05);
-  --border: rgba(255,255,255,.10);
+  /* Deep blacks for premium feel */
+  --bg: #050505;
+  --surface: rgba(255,255,255,.02);
+  --surface-strong: rgba(255,255,255,.04);
+  --border: rgba(255,255,255,.08);
+  --border-strong: rgba(255,255,255,.12);
 
-  --text: #f5f5f5;
-  --muted: rgba(245,245,245,.62);
+  --text: #fafafa;
+  --muted: rgba(250,250,250,.58);
 
-  /* Jesper accent (orange) */
-  --brand-300: #ffb38a;
-  --brand-400: #ff8a4a;
-  --brand-500: #ff6a1a; /* main */
-  --brand-600: #e45510;
-  --brand-700: #b6400c;
+  /* Electric orange accent (2026 muted neon) */
+  --electric-300: #fdba74;
+  --electric-400: #fb923c;
+  --electric-500: #ff6f1a; /* main */
+  --electric-600: #ea580c;
+  --electric-700: #c2410c;
+
+  /* Glass morphism tokens */
+  --glass-bg: rgba(255,255,255,.03);
+  --glass-border: rgba(255,255,255,.08);
+  --glass-blur: 16px;
 
   --ring: 0 0 0 2px;
-  --shadow-lg: 0 18px 55px rgba(0,0,0,.55);
+  --shadow-glass: 0 8px 32px rgba(0,0,0,.37);
+  --shadow-glass-lg: 0 18px 55px rgba(0,0,0,.55);
 
-  /* Jesper radius is smaller (less “rounded app”) */
-  --radius-lg: .9rem;
-  --radius-md: .75rem;
-  --pad: 1.1rem;
+  /* Sharp, modern radius */
+  --radius-lg: .75rem;
+  --radius-md: .65rem;
+  --radius-sm: .5rem;
+  --pad: 1.25rem;
 }
 
 
-/* Light mode (optional). Keep it readable but still “Jesper” */
+/* Light mode disabled - 2026 Premium is dark-only */
 @media (prefers-color-scheme: light) {
   :root{
-    color-scheme: light;
-    --bg: #000000;
-    --surface: rgba(10,10,10,.03);
-    --surface-strong: rgba(10,10,10,.05);
-    --border: rgba(10,10,10,.12);
-
-    --text: #0b0b0b;
-    --muted: rgba(11,11,11,. );
+    color-scheme: dark;
+    /* Force dark mode even if user prefers light */
   }
 }
 
@@ -56,26 +58,27 @@
 html, body { height: 100%; }
 
 body{
-  background: #070707;
+  background: #050505;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   position: relative;
+  overflow-x: hidden;
 }
 
-/* Jesper grain + subtle vignette */
+/* Premium 2026 grain + subtle glow */
 body::before{
   content:"";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: .16;
+  opacity: .12;
   background:
-    radial-gradient(900px 700px at 50% 0%, rgba(255,255,255,.06), transparent 60%),
-    radial-gradient(900px 700px at 50% 120%, rgba(255,255,255,.05), transparent 60%),
-    repeating-radial-gradient(circle at 20% 30%, rgba(255,255,255,.03) 0 1px, transparent 1px 3px),
-    repeating-linear-gradient(0deg, rgba(255,255,255,.02), rgba(255,255,255,.02) 1px, transparent 1px, transparent 3px);
+    radial-gradient(1000px 800px at 50% 0%, rgba(255,111,26,.03), transparent 70%),
+    radial-gradient(800px 600px at 80% 100%, rgba(255,111,26,.02), transparent 65%),
+    repeating-radial-gradient(circle at 25% 35%, rgba(255,255,255,.02) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.015), rgba(255,255,255,.015) 1px, transparent 1px, transparent 4px);
   mix-blend-mode: overlay;
 }
 
@@ -123,31 +126,38 @@ header { isolation: isolate; }
 }
 
 /* =========================================================
-   Typography (Jesper mood)
+   Typography (2026 Premium - Massive & Bold)
    ========================================================= */
 
 .kicker{
   text-transform: uppercase;
-  letter-spacing: .18em;
-  font-size: .72rem;
-  color: rgba(245,245,245,.55);
+  letter-spacing: .22em;
+  font-size: .68rem;
+  font-weight: 700;
+  color: rgba(250,250,250,.48);
+  opacity: 0.9;
 }
 
-/* Jesper-like headline: uppercase + tighter tracking */
+/* 2026 Massive headline: BOLD + TIGHT tracking */
 .h1{
-  font-size: clamp(2.35rem, 6vw, 4.2rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: .95;
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: .88;
   text-transform: uppercase;
+  background: linear-gradient(180deg, #fafafa 0%, rgba(250,250,250,.85) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* paragraph in Jesper: smaller + airy */
+/* Lead paragraph: clean + refined */
 .lead{
-  font-size: 1rem;
-  line-height: 1.65;
+  font-size: 1.05rem;
+  line-height: 1.7;
   color: var(--muted);
-  max-width: 62ch;
+  max-width: 60ch;
+  font-weight: 400;
 }
 
 
@@ -192,49 +202,51 @@ header { isolation: isolate; }
 
 
 /* =========================================================
-   Cards / Tiles (less glass, more editorial)
+   Cards / Tiles (Glassmorphism 2.0)
    ========================================================= */
 
 .card{
-  background: rgba(255,255,255,.03);
-  border: 1px solid rgba(255,255,255,.10);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: var(--pad);
-  box-shadow: none;
-  backdrop-filter: none;
+  box-shadow: var(--shadow-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  will-change: transform;
 }
 
 .card:hover{
-  border-color: color-mix(in srgb, var(--brand-500) 22%, rgba(255,255,255,.10));
+  border-color: color-mix(in srgb, var(--electric-500) 25%, var(--glass-border));
+  box-shadow: 0 0 0 1px rgba(255,111,26,.1), var(--shadow-glass);
 }
 
 .tile{
   position: relative;
   overflow: hidden;
-  transition: transform .25s ease, border-color .2s ease;
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), border-color .2s ease, box-shadow .3s ease;
 }
 
 .tile:hover{
-  transform: translateY(-3px);
+  transform: translateY(-4px) scale(1.01);
 }
 
-/* subtle inner glow on hover */
+/* Electric glow on hover */
 .tile::after{
   content:"";
   position:absolute;
   inset:0;
   pointer-events:none;
   opacity:0;
-  transition: opacity .18s ease;
-  background: radial-gradient(260px 260px at var(--mx,50%) var(--my,50%),
-    color-mix(in srgb, var(--brand-500) 18%, transparent),
-    transparent 62%);
+  transition: opacity .25s ease;
+  background: radial-gradient(300px 300px at var(--mx,50%) var(--my,50%),
+    color-mix(in srgb, var(--electric-500) 15%, transparent),
+    transparent 65%);
 }
 .tile:hover::after{ opacity:1; }
 
-
 .tile[role="button"]:focus-visible{
-  box-shadow: var(--ring) color-mix(in srgb, var(--brand-500) 35%, transparent);
+  box-shadow: var(--ring) color-mix(in srgb, var(--electric-500) 40%, transparent);
   outline: none;
 }
 
@@ -288,37 +300,45 @@ header { isolation: isolate; }
 }
 
 /* =========================================================
-   Buttons
+   Buttons (2026 Premium + Elastic Animation)
    ========================================================= */
 
-/* Keep your old .btn classes for existing places (optional) */
 .btn{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: .5rem;
-  padding: .65rem 1.05rem;
+  gap: .55rem;
+  padding: .75rem 1.25rem;
   border-radius: var(--radius-md);
   font-weight: 700;
   color: var(--text);
-  background: rgba(255,106,26,.14);
-  border: 1px solid color-mix(in srgb, var(--brand-500) 70%, rgba(255,255,255,.18));
-  transition: transform .08s ease, background-color .2s ease, border-color .2s ease;
+  background: rgba(255,111,26,.12);
+  border: 1px solid color-mix(in srgb, var(--electric-500) 65%, rgba(255,255,255,.15));
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1),
+              background-color .2s ease,
+              border-color .2s ease,
+              box-shadow .2s ease;
   outline: none;
   text-transform: uppercase;
-  letter-spacing: .12em;
-  font-size: .82rem;
+  letter-spacing: .14em;
+  font-size: .8rem;
+  will-change: transform;
 }
 
 .btn:hover{
-  background: rgba(255,106,26,.20);
-  border-color: var(--brand-500);
+  background: rgba(255,111,26,.18);
+  border-color: var(--electric-500);
+  box-shadow: 0 0 20px rgba(255,111,26,.15);
+  transform: scale(1.02);
 }
 
-.btn:active{ transform: translateY(1px); }
+.btn:active{
+  transform: scale(0.97);
+  transition: transform .1s ease;
+}
 
 .btn:focus-visible{
-  box-shadow: var(--ring) color-mix(in srgb, var(--brand-500) 28%, transparent);
+  box-shadow: var(--ring) color-mix(in srgb, var(--electric-500) 35%, transparent);
 }
 
 /* Secondary */
@@ -343,59 +363,70 @@ header { isolation: isolate; }
   border-color: rgba(255,255,255,.35);
 }
 
-/* Jesper pills (use this on menu + services actions) */
+/* Premium pills (2026 + Elastic) */
 .btn-jesper{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  gap:.55rem;
+  gap:.6rem;
 
-  padding:.72rem 1.15rem;
+  padding:.75rem 1.3rem;
   border-radius:999px;
 
-  font-weight:750;
-  font-size:.82rem;
-  letter-spacing:.14em;
+  font-weight:700;
+  font-size:.78rem;
+  letter-spacing:.16em;
   text-transform: uppercase;
 
-  border:1px solid rgba(255,255,255,.25);
+  border:1px solid rgba(255,255,255,.18);
   color: var(--text);
   background: transparent;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 
-  transition: background-color .2s ease, border-color .2s ease, transform .08s ease;
+  transition: background-color .2s ease,
+              border-color .2s ease,
+              transform .3s cubic-bezier(.34,1.56,.64,1),
+              box-shadow .2s ease;
   outline:none;
+  will-change: transform;
 }
 
 .btn-jesper:hover{
-  border-color: rgba(255,255,255,.45);
-  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.4);
+  background: rgba(255,255,255,.08);
+  transform: scale(1.03);
 }
 
-
-.btn-jesper:active{ transform: translateY(1px); }
+.btn-jesper:active{
+  transform: scale(0.96);
+  transition: transform .1s ease;
+}
 
 .btn-jesper:focus-visible{
-  box-shadow: var(--ring) color-mix(in srgb, var(--text) 18%, transparent);
+  box-shadow: var(--ring) color-mix(in srgb, var(--text) 20%, transparent);
 }
 
-/* primary Jesper pill */
+/* Primary electric pill */
 .btn-jesper.primary{
-  border-color: color-mix(in srgb, var(--brand-500) 75%, rgba(255,255,255,.25));
+  border-color: color-mix(in srgb, var(--electric-500) 70%, rgba(255,255,255,.2));
   color: var(--text);
-  background: rgba(255,106,26,.12);
+  background: rgba(255,111,26,.11);
 }
 
 .btn-jesper.primary:hover{
-  background: rgba(255,106,26,.18);
-  border-color: var(--brand-500);
+  background: rgba(255,111,26,.18);
+  border-color: var(--electric-500);
+  box-shadow: 0 0 20px rgba(255,111,26,.12);
+  transform: scale(1.03);
 }
 
 .btn-jesper .arrow{
-  opacity:.85;
-  transition: transform .2s ease, opacity .2s ease;
+  opacity:.8;
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
 }
 .btn-jesper:hover .arrow{
-  transform: translateX(3px);
+  transform: translateX(4px);
   opacity:1;
 }
 
@@ -456,13 +487,13 @@ header { isolation: isolate; }
   box-shadow: 0 0 0 6px rgba(255,106,26,.10);
 }
 
-/* 1. Το menu ΠΑΝΩ από τα πάντα */
+/* 1. Menu overlay - 2026 deep black */
 #site-menu {
   position: fixed !important;
   inset: 0 !important;
   z-index: 2147483647 !important;
 
-  background: #070707 !important; /* απόλυτο μαύρο poster */
+  background: #050505 !important; /* 2026 deep black */
   opacity: 1 !important;
   isolation: isolate;
 }

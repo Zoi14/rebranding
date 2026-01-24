@@ -116,16 +116,21 @@ export default function Nav() {
 
   useFocusTrap(drawerRef, open, () => setOpen(false));
 
-  // ===== Scroll-based header feel (every scroll) =====
+  // ===== 2026 Premium scroll-based glassmorphic header =====
   const { scrollY } = useScroll();
   const headerBg = useTransform(
     scrollY,
-    [0, 120],
-    ["rgba(0,0,0,.55)", "rgba(0,0,0,.78)"]
+    [0, 100],
+    ["rgba(5,5,5,.35)", "rgba(5,5,5,.75)"]
   );
-  const headerBlur = useTransform(scrollY, [0, 120], ["blur(8px)", "blur(12px)"]);
-  const headerHeight = useTransform(scrollY, [0, 120], [56, 50]); // px
-  const headerY = useTransform(scrollY, [0, 120], [0, -2]);
+  const headerBlur = useTransform(scrollY, [0, 100], ["blur(12px)", "blur(16px)"]);
+  const headerBorder = useTransform(
+    scrollY,
+    [0, 100],
+    ["rgba(255,255,255,.06)", "rgba(255,255,255,.10)"]
+  );
+  const headerHeight = useTransform(scrollY, [0, 100], [64, 56]); // px
+  const headerY = useTransform(scrollY, [0, 100], [12, 0]);
 
   // ===== 3D tilt on hover for the top bar =====
   const mx = useMotionValue(0);
@@ -151,25 +156,27 @@ export default function Nav() {
   }
 
   return (
-    <header className="sticky top-0 z-50">
-      {/* top bar */}
+    <header className="fixed top-0 left-0 right-0 z-50 px-4 pt-4">
+      {/* Floating glassmorphic bar */}
       <motion.div
         ref={topRef}
         onMouseMove={onMove}
         onMouseLeave={onLeave}
-        className="border-b"
+        className="mx-auto max-w-6xl rounded-2xl border"
         style={{
-          borderColor: "rgba(255,255,255,.10)",
+          borderColor: headerBorder,
           background: headerBg,
           backdropFilter: headerBlur as any,
+          WebkitBackdropFilter: headerBlur as any,
           y: headerY,
+          boxShadow: "0 8px 32px rgba(0,0,0,.25)",
         }}
       >
         <motion.nav
-          className="mx-auto max-w-6xl px-4 flex items-center justify-between"
+          className="px-6 flex items-center justify-between"
           style={{
             height: headerHeight,
-            perspective: 1000,
+            perspective: 1200,
           }}
         >
           <motion.div
@@ -181,89 +188,131 @@ export default function Nav() {
             className="flex w-full items-center justify-between"
           >
             {/* BRAND */}
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2"
-              style={{ transform: "translateZ(10px)" }}
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              style={{ transform: "translateZ(12px)" }}
             >
-              <Image
-                src="/img/logo.png"
-                alt="Rebranding logo"
-                width={100}
-                height={70}
-                priority
-                className="rounded-sm"
-              />
-              <span className="hidden sm:inline text-base font-semibold text-white font-display">
-                Rebranding
-              </span>
-              <span className="hidden sm:inline text-neutral-400 text-sm">— Ζωή</span>
-            </Link>
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2.5"
+              >
+                <Image
+                  src="/img/logo.png"
+                  alt="Rebranding logo"
+                  width={90}
+                  height={63}
+                  priority
+                  className="rounded-lg"
+                />
+                <div className="hidden sm:flex flex-col">
+                  <span className="text-sm font-bold text-white tracking-wide font-display uppercase">
+                    Rebranding
+                  </span>
+                  <span className="text-xs opacity-60 tracking-wider">by Ζωή</span>
+                </div>
+              </Link>
+            </motion.div>
 
             {/* Desktop minimal */}
             <div
-              className="hidden md:flex items-center gap-6 text-sm"
-              style={{ color: "rgba(245,245,245,.62)", transform: "translateZ(10px)" }}
+              className="hidden md:flex items-center gap-8 text-sm"
+              style={{ transform: "translateZ(12px)" }}
             >
               {items.map((it) => (
-                <Link
+                <motion.div
                   key={it.href}
-                  href={it.href}
-                  className="hover:text-white transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 >
-                  {it.label}
-                </Link>
+                  <Link
+                    href={it.href}
+                    className="font-medium tracking-wide transition-colors"
+                    style={{
+                      color: "rgba(250,250,250,.6)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = "rgba(255,111,26,.95)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = "rgba(250,250,250,.6)";
+                    }}
+                  >
+                    {it.label}
+                  </Link>
+                </motion.div>
               ))}
-              <Link href="/contact" className="btn-jesper primary">
-                Ζήτησε προσφορά <span className="arrow">→</span>
-              </Link>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              >
+                <Link href="/contact" className="btn-jesper primary">
+                  Ζήτησε προσφορά <span className="arrow">→</span>
+                </Link>
+              </motion.div>
             </div>
 
-            {/* MENU button */}
-            <button
+            {/* MENU button - Premium glassmorphic */}
+            <motion.button
               aria-label={open ? "Κλείσιμο μενού" : "Μενού"}
               aria-expanded={open}
               aria-controls="site-menu"
               onClick={() => setOpen((v) => !v)}
-              className="inline-flex items-center gap-3"
+              className="inline-flex items-center gap-3 md:hidden"
               style={{
-                color: "rgba(255,255,255,.96)",
-                letterSpacing: ".14em",
+                color: "rgba(255,255,255,.95)",
+                letterSpacing: ".16em",
                 textTransform: "uppercase",
-                fontSize: ".78rem",
-                fontWeight: 800,
-                transform: "translateZ(10px)",
+                fontSize: ".75rem",
+                fontWeight: 700,
+                transform: "translateZ(12px)",
               }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
-              <span className="hidden sm:inline">{open ? "Close" : "Menu"}</span>
+              <span className="hidden sm:inline font-bold">{open ? "Close" : "Menu"}</span>
 
-              <span
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border"
+              <motion.span
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-md"
                 style={{
-                  borderColor: "rgba(255,255,255,.22)",
-                  background: "rgba(255,255,255,.03)",
+                  borderColor: open ? "rgba(255,111,26,.6)" : "rgba(255,255,255,.15)",
+                  background: open ? "rgba(255,111,26,.08)" : "rgba(255,255,255,.04)",
+                  boxShadow: open ? "0 0 20px rgba(255,111,26,.15)" : "none",
+                }}
+                animate={{
+                  borderColor: open ? "rgba(255,111,26,.6)" : "rgba(255,255,255,.15)",
+                  background: open ? "rgba(255,111,26,.08)" : "rgba(255,255,255,.04)",
                 }}
                 aria-hidden
               >
                 <span className="relative block h-4 w-4">
-                  <span
-                    className={`absolute inset-x-0 top-0 h-[2px] bg-current transition-transform duration-300 ${
-                      open ? "translate-y-[6px] rotate-45" : ""
-                    }`}
+                  <motion.span
+                    className="absolute inset-x-0 top-0 h-[2px] rounded-full bg-current"
+                    animate={{
+                      translateY: open ? "6px" : "0px",
+                      rotate: open ? 45 : 0,
+                    }}
+                    transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
                   />
-                  <span
-                    className={`absolute inset-x-0 bottom-0 h-[2px] bg-current transition-transform duration-300 ${
-                      open ? "-translate-y-[6px] -rotate-45" : ""
-                    }`}
+                  <motion.span
+                    className="absolute inset-x-0 bottom-0 h-[2px] rounded-full bg-current"
+                    animate={{
+                      translateY: open ? "-6px" : "0px",
+                      rotate: open ? -45 : 0,
+                    }}
+                    transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
                   />
                 </span>
-              </span>
-            </button>
+              </motion.span>
+            </motion.button>
           </motion.div>
         </motion.nav>
       </motion.div>
 
-      {/* Fullscreen overlay menu */}
+      {/* Fullscreen overlay menu - 2026 Premium */}
       <AnimatePresence>
         {open && (
           <motion.aside
@@ -277,17 +326,25 @@ export default function Nav() {
             aria-modal="true"
             className="fixed inset-0"
             style={{
-              backgroundColor: "#070707",
+              backgroundColor: "#050505",
               zIndex: 2147483647,
               opacity: 1,
               isolation: "isolate",
             }}
           >
+            {/* Electric gradient glow in background */}
+            <div
+              className="absolute inset-0 opacity-10"
+              style={{
+                background: "radial-gradient(ellipse 1000px 600px at 50% 30%, rgba(255,111,26,.12), transparent 70%)",
+              }}
+            />
+
             <div
               className="absolute inset-0"
               onClick={() => setOpen(false)}
               aria-hidden
-              style={{ backgroundColor: "#070707", opacity: 1 }}
+              style={{ backgroundColor: "transparent" }}
             />
 
             <motion.div
@@ -297,7 +354,7 @@ export default function Nav() {
               onClick={(e) => e.stopPropagation()}
               className="relative h-full"
               style={{
-                backgroundColor: "#070707",
+                backgroundColor: "transparent",
                 zIndex: 1,
                 opacity: 1,
                 outline: "none",
@@ -315,30 +372,39 @@ export default function Nav() {
                   />
                 </div>
 
-                <button
+                <motion.button
                   onClick={() => setOpen(false)}
-                  className="inline-flex items-center gap-2"
+                  className="inline-flex items-center gap-3"
                   style={{
-                    color: "rgba(255,255,255,.96)",
-                    letterSpacing: ".12em",
+                    color: "rgba(255,255,255,.95)",
+                    letterSpacing: ".16em",
                     textTransform: "uppercase",
-                    fontSize: ".78rem",
-                    fontWeight: 800,
+                    fontSize: ".75rem",
+                    fontWeight: 700,
                   }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   aria-label="Κλείσιμο"
                 >
-                  <span>Close</span>
-                  <span
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border"
+                  <span className="font-bold">Close</span>
+                  <motion.span
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-md text-lg"
                     style={{
-                      borderColor: "rgba(255,255,255,.18)",
-                      background: "rgba(255,255,255,.03)",
+                      borderColor: "rgba(255,111,26,.6)",
+                      background: "rgba(255,111,26,.08)",
+                      boxShadow: "0 0 20px rgba(255,111,26,.15)",
+                    }}
+                    whileHover={{
+                      borderColor: "rgba(255,111,26,.8)",
+                      background: "rgba(255,111,26,.12)",
+                      boxShadow: "0 0 30px rgba(255,111,26,.25)",
                     }}
                     aria-hidden
                   >
                     ✕
-                  </span>
-                </button>
+                  </motion.span>
+                </motion.button>
               </div>
 
               {/* items */}
