@@ -524,6 +524,30 @@ select.select-dark option:checked {
   color: #ffffff;
 }
 
+/* =========================================================
+   Menu Animations
+   ========================================================= */
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.1);
+  }
+}
+
 
 
 
