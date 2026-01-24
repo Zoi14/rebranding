@@ -214,9 +214,19 @@ export default function Nav() {
                   {it.label}
                 </Link>
               ))}
-              <Link href="/contact" className="btn-jesper primary">
-                Ζήτησε προσφορά <span className="arrow">→</span>
-              </Link>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 10,
+                }}
+              >
+                <Link href="/contact" className="btn-jesper primary">
+                  Ζήτησε προσφορά <span className="arrow">→</span>
+                </Link>
+              </motion.div>
             </div>
 
             {/* MENU button */}
@@ -366,13 +376,23 @@ export default function Nav() {
                         Instagram <span className="arrow">→</span>
                       </a>
 
-                      <Link
-                        href="/contact"
-                        className="btn-jesper primary"
-                        onClick={() => setOpen(false)}
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 10,
+                        }}
                       >
-                        Ζήτησε προσφορά <span className="arrow">→</span>
-                      </Link>
+                        <Link
+                          href="/contact"
+                          className="btn-jesper primary"
+                          onClick={() => setOpen(false)}
+                        >
+                          Ζήτησε προσφορά <span className="arrow">→</span>
+                        </Link>
+                      </motion.div>
                     </motion.div>
 
                     <motion.p
