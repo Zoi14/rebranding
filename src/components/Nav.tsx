@@ -1,114 +1,43 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  useScroll,
-  useSpring,
-  useTransform,
-} from "framer-motion";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 
-const overlay = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { duration: 0.18 } },
-  exit: { opacity: 0, transition: { duration: 0.14 } },
-};
-
-const panel = {
-  hidden: { opacity: 0, y: 10 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.22 } },
-  exit: { opacity: 0, y: 8, transition: { duration: 0.16 } },
-};
-
-const list = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.06,
-      delayChildren: 0.06,
-    },
-  },
-};
-
-const itemVar = {
-  hidden: { opacity: 0, y: 14, filter: "blur(6px)" },
-  show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.42 } },
-};
-
-type Item = { href: string; label: string };
-
-function MenuItem({
-  href,
-  label,
-  onClick,
-}: {
-  href: string;
-  label: string;
-  onClick: () => void;
-}) {
-  const pathname = usePathname();
-  const active = useMemo(
-    () => (href === "/" ? pathname === "/" : pathname?.startsWith(href)),
-    [href, pathname]
-  );
-
-  return (
-    <Link
-      href={href}
-      onClick={onClick}
-      aria-current={active ? "page" : undefined}
-      className="group flex items-center justify-between py-5 border-b"
-      style={{
-        borderColor: "rgba(255,255,255,.10)",
-        textDecoration: "none",
-      }}
-    >
-      <span
-        className="text-3xl sm:text-4xl font-semibold tracking-tight"
-        style={{
-          color: active ? "rgba(255,255,255,.98)" : "rgba(255,255,255,.92)",
-          textTransform: "uppercase",
-          letterSpacing: "-0.01em",
-        }}
-      >
-        {label}
-      </span>
-
-      <span
-        aria-hidden
-        className="text-xl opacity-70 group-hover:opacity-100 transition-opacity"
-        style={{ color: "rgba(245,245,245,.62)" }}
-      >
-        ↓
-      </span>
-    </Link>
-  );
-}
+type NavItem = { href: string; label: string };
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
-  const topRef = useRef<HTMLDivElement | null>(null);
+  const pathname = usePathname();
 
-  // keep your categories (do not change labels)
-  const items: Item[] = useMemo(
+  const items: NavItem[] = useMemo(
     () => [
       { href: "/", label: "Αρχική" },
       { href: "/services", label: "Υπηρεσίες" },
       { href: "/contact", label: "Επικοινωνία" },
     ],
-    [] 
+    []
   );
 
-  // stop background scroll when open
+  // Handle scroll effect
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
     return () => {
       document.body.style.overflow = "";
     };
@@ -116,279 +45,246 @@ export default function Nav() {
 
   useFocusTrap(drawerRef, open, () => setOpen(false));
 
-  // ===== Scroll-based header feel (every scroll) =====
-  const { scrollY } = useScroll();
-  const headerBg = useTransform(
-    scrollY,
-    [0, 120],
-    ["rgba(0,0,0,.55)", "rgba(0,0,0,.78)"]
-  );
-  const headerBlur = useTransform(scrollY, [0, 120], ["blur(8px)", "blur(12px)"]);
-  const headerHeight = useTransform(scrollY, [0, 120], [56, 50]); // px
-  const headerY = useTransform(scrollY, [0, 120], [0, -2]);
-
-  // ===== 3D tilt on hover for the top bar =====
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const sx = useSpring(mx, { stiffness: 160, damping: 20 });
-  const sy = useSpring(my, { stiffness: 160, damping: 20 });
-
-  const rotateY = useTransform(sx, [-0.5, 0.5], [-6, 6]);
-  const rotateX = useTransform(sy, [-0.5, 0.5], [5, -5]);
-
-  function onMove(e: React.MouseEvent) {
-    const el = topRef.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    mx.set(px);
-    my.set(py);
-  }
-  function onLeave() {
-    mx.set(0);
-    my.set(0);
-  }
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname?.startsWith(href);
+  };
 
   return (
-    <header className="sticky top-0 z-50">
-      {/* top bar */}
-      <motion.div
-        ref={topRef}
-        onMouseMove={onMove}
-        onMouseLeave={onLeave}
-        className="border-b"
+    <>
+      {/* Header */}
+      <header
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
         style={{
-          borderColor: "rgba(255,255,255,.10)",
-          background: headerBg,
-          backdropFilter: headerBlur as any,
-          y: headerY,
+          background: scrolled ? "rgba(255, 255, 255, 0.95)" : "transparent",
+          backdropFilter: scrolled ? "blur(20px)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(20px)" : "none",
+          borderBottom: scrolled ? "1px solid var(--border)" : "1px solid transparent",
         }}
       >
-        <motion.nav
-          className="mx-auto max-w-6xl px-4 flex items-center justify-between"
-          style={{
-            height: headerHeight,
-            perspective: 1000,
-          }}
-        >
-          <motion.div
-            style={{
-              rotateX,
-              rotateY,
-              transformStyle: "preserve-3d",
-            }}
-            className="flex w-full items-center justify-between"
-          >
-            {/* BRAND */}
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2"
-              style={{ transform: "translateZ(10px)" }}
-            >
-              <Image
-                src="/img/logo.png"
-                alt="Rebranding logo"
-                width={100}
-                height={70}
-                priority
-                className="rounded-sm"
-              />
-              <span className="hidden sm:inline text-base font-semibold text-white font-display">
+        <div className="container-page">
+          <nav className="flex items-center justify-between h-20 lg:h-24">
+            {/* Logo */}
+            <Link href="/" className="group flex items-center gap-3">
+              <span
+                className="text-xl lg:text-2xl font-display font-medium tracking-tight transition-colors"
+                style={{ color: scrolled ? "var(--text)" : "white" }}
+              >
                 Rebranding
               </span>
-              <span className="hidden sm:inline text-neutral-400 text-sm">— Ζωή</span>
+              <span
+                className="hidden sm:block text-xs uppercase tracking-widest transition-colors"
+                style={{
+                  color: scrolled ? "var(--accent)" : "rgba(255,255,255,0.7)",
+                  letterSpacing: "0.2em"
+                }}
+              >
+                by Zoe
+              </span>
             </Link>
 
-            {/* Desktop minimal */}
-            <div
-              className="hidden md:flex items-center gap-6 text-sm"
-              style={{ color: "rgba(245,245,245,.62)", transform: "translateZ(10px)" }}
-            >
-              {items.map((it) => (
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center gap-12">
+              {items.map((item) => (
                 <Link
-                  key={it.href}
-                  href={it.href}
-                  className="hover:text-white transition-colors"
+                  key={item.href}
+                  href={item.href}
+                  className="relative text-sm uppercase tracking-widest transition-colors group"
+                  style={{
+                    color: scrolled
+                      ? (isActive(item.href) ? "var(--accent)" : "var(--text-muted)")
+                      : (isActive(item.href) ? "white" : "rgba(255,255,255,0.7)"),
+                    letterSpacing: "0.15em",
+                  }}
                 >
-                  {it.label}
+                  {item.label}
+                  <span
+                    className="absolute -bottom-1 left-0 h-px transition-all duration-300"
+                    style={{
+                      width: isActive(item.href) ? "100%" : "0%",
+                      background: scrolled ? "var(--accent)" : "white",
+                    }}
+                  />
+                  <span
+                    className="absolute -bottom-1 left-0 h-px w-0 group-hover:w-full transition-all duration-300"
+                    style={{
+                      background: scrolled ? "var(--accent)" : "white",
+                    }}
+                  />
                 </Link>
               ))}
-              <Link href="/contact" className="btn-jesper primary">
-                Ζήτησε προσφορά <span className="arrow">→</span>
-              </Link>
             </div>
 
-            {/* MENU button */}
-            <button
-              aria-label={open ? "Κλείσιμο μενού" : "Μενού"}
-              aria-expanded={open}
-              aria-controls="site-menu"
-              onClick={() => setOpen((v) => !v)}
-              className="inline-flex items-center gap-3"
-              style={{
-                color: "rgba(255,255,255,.96)",
-                letterSpacing: ".14em",
-                textTransform: "uppercase",
-                fontSize: ".78rem",
-                fontWeight: 800,
-                transform: "translateZ(10px)",
-              }}
-            >
-              <span className="hidden sm:inline">{open ? "Close" : "Menu"}</span>
-
-              <span
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border"
+            {/* Right side */}
+            <div className="flex items-center gap-4">
+              {/* CTA Button - Desktop */}
+              <Link
+                href="/contact"
+                className="hidden lg:inline-flex px-6 py-3 text-xs uppercase tracking-widest transition-all duration-300"
                 style={{
-                  borderColor: "rgba(255,255,255,.22)",
-                  background: "rgba(255,255,255,.03)",
+                  background: scrolled ? "var(--accent)" : "white",
+                  color: scrolled ? "white" : "var(--bg-dark)",
+                  letterSpacing: "0.12em",
                 }}
-                aria-hidden
               >
-                <span className="relative block h-4 w-4">
-                  <span
-                    className={`absolute inset-x-0 top-0 h-[2px] bg-current transition-transform duration-300 ${
-                      open ? "translate-y-[6px] rotate-45" : ""
-                    }`}
-                  />
-                  <span
-                    className={`absolute inset-x-0 bottom-0 h-[2px] bg-current transition-transform duration-300 ${
-                      open ? "-translate-y-[6px] -rotate-45" : ""
-                    }`}
-                  />
+                Ζήτησε Προσφορά
+              </Link>
+
+              {/* Menu Button */}
+              <button
+                onClick={() => setOpen(true)}
+                className="flex items-center gap-3 py-2 transition-colors"
+                style={{
+                  color: scrolled ? "var(--text)" : "white",
+                }}
+              >
+                <span className="hidden sm:block text-xs uppercase tracking-widest" style={{ letterSpacing: "0.15em" }}>
+                  Menu
                 </span>
-              </span>
-            </button>
-          </motion.div>
-        </motion.nav>
-      </motion.div>
-
-      {/* Fullscreen overlay menu */}
-      <AnimatePresence>
-        {open && (
-          <motion.aside
-            key="menu"
-            initial="hidden"
-            animate="show"
-            exit="exit"
-            variants={overlay}
-            id="site-menu"
-            role="dialog"
-            aria-modal="true"
-            className="fixed inset-0"
-            style={{
-              backgroundColor: "#070707",
-              zIndex: 2147483647,
-              opacity: 1,
-              isolation: "isolate",
-            }}
-          >
-            <div
-              className="absolute inset-0"
-              onClick={() => setOpen(false)}
-              aria-hidden
-              style={{ backgroundColor: "#070707", opacity: 1 }}
-            />
-
-            <motion.div
-              variants={panel}
-              ref={drawerRef}
-              tabIndex={-1}
-              onClick={(e) => e.stopPropagation()}
-              className="relative h-full"
-              style={{
-                backgroundColor: "#070707",
-                zIndex: 1,
-                opacity: 1,
-                outline: "none",
-              }}
-            >
-              {/* top row */}
-              <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Image
-                    src="/img/logo.png"
-                    alt="Rebranding logo"
-                    width={100}
-                    height={70}
-                    className="rounded-sm"
+                <div className="flex flex-col gap-1.5 w-6">
+                  <span
+                    className="h-px w-full transition-colors"
+                    style={{ background: scrolled ? "var(--text)" : "white" }}
+                  />
+                  <span
+                    className="h-px w-4 ml-auto transition-colors"
+                    style={{ background: scrolled ? "var(--text)" : "white" }}
                   />
                 </div>
+              </button>
+            </div>
+          </nav>
+        </div>
+      </header>
 
-                <button
-                  onClick={() => setOpen(false)}
-                  className="inline-flex items-center gap-2"
-                  style={{
-                    color: "rgba(255,255,255,.96)",
-                    letterSpacing: ".12em",
-                    textTransform: "uppercase",
-                    fontSize: ".78rem",
-                    fontWeight: 800,
-                  }}
-                  aria-label="Κλείσιμο"
-                >
-                  <span>Close</span>
-                  <span
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border"
+      {/* Fullscreen Menu */}
+      <div
+        className="fixed inset-0 transition-all duration-500"
+        style={{
+          zIndex: 9999,
+          opacity: open ? 1 : 0,
+          pointerEvents: open ? "auto" : "none",
+        }}
+      >
+        {/* Dark overlay */}
+        <div
+          className="absolute inset-0 transition-opacity duration-500"
+          style={{
+            background: "var(--bg-dark)",
+            opacity: open ? 1 : 0,
+          }}
+          onClick={() => setOpen(false)}
+        />
+
+        {/* Menu panel */}
+        <div
+          ref={drawerRef}
+          className="absolute top-0 right-0 h-full w-full lg:w-[500px] transition-transform duration-500 ease-out"
+          style={{
+            background: "var(--bg)",
+            transform: open ? "translateX(0)" : "translateX(100%)",
+          }}
+        >
+          <div className="h-full flex flex-col">
+            {/* Menu Header */}
+            <div className="flex items-center justify-between h-20 lg:h-24 px-6 lg:px-12 border-b" style={{ borderColor: "var(--border)" }}>
+              <span className="text-xs uppercase tracking-widest" style={{ color: "var(--text-muted)", letterSpacing: "0.2em" }}>
+                Menu
+              </span>
+              <button
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 text-xs uppercase tracking-widest transition-colors hover:text-[var(--accent)]"
+                style={{ color: "var(--text)", letterSpacing: "0.15em" }}
+              >
+                Close
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Menu Content */}
+            <div className="flex-1 overflow-y-auto px-6 lg:px-12 py-12">
+              {/* Navigation */}
+              <nav className="space-y-1 mb-16">
+                {items.map((item, index) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className="flex items-center justify-between py-5 border-b group transition-colors hover:text-[var(--accent)]"
                     style={{
-                      borderColor: "rgba(255,255,255,.18)",
-                      background: "rgba(255,255,255,.03)",
+                      borderColor: "var(--border)",
+                      color: isActive(item.href) ? "var(--accent)" : "var(--text)",
                     }}
-                    aria-hidden
                   >
-                    ✕
-                  </span>
-                </button>
-              </div>
+                    <div className="flex items-center gap-6">
+                      <span className="text-xs" style={{ color: "var(--text-light)" }}>
+                        0{index + 1}
+                      </span>
+                      <span className="text-2xl lg:text-3xl font-display font-light">
+                        {item.label}
+                      </span>
+                    </div>
+                    <span className="text-lg transition-transform group-hover:translate-x-1">
+                      →
+                    </span>
+                  </Link>
+                ))}
+              </nav>
 
-              {/* items */}
-              <div className="mx-auto max-w-6xl px-4">
-                <div className="max-w-xl">
-                  {/* ✅ stagger every time menu opens */}
-                  <motion.div variants={list} initial="hidden" animate="show">
-                    {items.map((it) => (
-                      <motion.div key={it.href} variants={itemVar}>
-                        <MenuItem
-                          href={it.href}
-                          label={it.label}
-                          onClick={() => setOpen(false)}
-                        />
-                      </motion.div>
-                    ))}
+              {/* Contact Info */}
+              <div className="space-y-8">
+                <p className="text-xs uppercase tracking-widest" style={{ color: "var(--text-light)", letterSpacing: "0.2em" }}>
+                  Επικοινωνία
+                </p>
 
-                    <motion.div variants={itemVar} className="mt-6 flex flex-wrap gap-3">
-                      <a
-                        href="https://instagram.com/rebranding_byzoe"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="btn-jesper"
-                      >
-                        Instagram <span className="arrow">→</span>
-                      </a>
-
-                      <Link
-                        href="/contact"
-                        className="btn-jesper primary"
-                        onClick={() => setOpen(false)}
-                      >
-                        Ζήτησε προσφορά <span className="arrow">→</span>
-                      </Link>
-                    </motion.div>
-
-                    <motion.p
-                      variants={itemVar}
-                      className="mt-8 text-xs"
-                      style={{ color: "rgba(245,245,245,.62)" }}
-                    >
-                      Content • Social Media • Web Styling
-                    </motion.p>
-                  </motion.div>
+                <div className="space-y-6">
+                  <a
+                    href="mailto:rebrandingbyzoe@gmail.com"
+                    className="block text-lg transition-colors hover:text-[var(--accent)]"
+                    style={{ color: "var(--text)" }}
+                  >
+                    rebrandingbyzoe@gmail.com
+                  </a>
+                  <a
+                    href="https://instagram.com/rebranding_byzoe"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 text-lg transition-colors hover:text-[var(--accent)]"
+                    style={{ color: "var(--text)" }}
+                  >
+                    @rebranding_byzoe
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M7 17L17 7M17 7H7M17 7v10" />
+                    </svg>
+                  </a>
                 </div>
+
+                <Link
+                  href="/contact"
+                  onClick={() => setOpen(false)}
+                  className="inline-flex mt-4 px-8 py-4 text-xs uppercase tracking-widest transition-opacity hover:opacity-80"
+                  style={{
+                    background: "var(--accent)",
+                    color: "white",
+                    letterSpacing: "0.12em",
+                  }}
+                >
+                  Δωρεάν Αξιολόγηση
+                </Link>
               </div>
-            </motion.div>
-          </motion.aside>
-        )}
-      </AnimatePresence>
-    </header>
+            </div>
+
+            {/* Menu Footer */}
+            <div className="px-6 lg:px-12 py-6 border-t" style={{ borderColor: "var(--border)" }}>
+              <p className="text-xs" style={{ color: "var(--text-light)" }}>
+                © {new Date().getFullYear()} Rebranding by Zoe
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

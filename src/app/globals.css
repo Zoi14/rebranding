@@ -3,527 +3,269 @@
 @tailwind components;
 @tailwind utilities;
 
-/* =========================================================
-   JESPER-STYLE GLOBALS (Dark / Grain / Editorial)
-   Copy-paste whole file
-   ========================================================= */
+/* ==========================================================================
+   DESIGN SYSTEM - Professional Blue & White Theme 2026 (Fixed Visibility)
+   ========================================================================== */
 
-/* ===== Theme tokens ===== */
-:root{
-  color-scheme: dark;
+:root {
+  /* ===== COLORS ===== */
+  /* Backgrounds */
+  --bg: #FFFFFF;
+  --bg-secondary: #F8FAFC;
+  --bg-tertiary: #F1F5F9;
+  --bg-dark: #0F172A;
+  --bg-glass: rgba(255, 255, 255, 0.7);
 
-  /* Jesper: near-black + film grain */
-  --bg: #070707;
-  --surface: rgba(255,255,255,.03);
-  --surface-strong: rgba(255,255,255,.05);
-  --border: rgba(255,255,255,.10);
+  /* Text - Dark Mode Base Colors */
+  --text: #0F172A;
+  /* Σκούρο μπλε για λευκό φόντο */
+  --text-inverse: #F8FAFC;
+  /* Λευκό για σκούρο φόντο */
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+  --text-light: #94A3B8;
 
-  --text: #f5f5f5;
-  --muted: rgba(245,245,245,.62);
+  /* Accent - Electric Blue */
+  --accent: #2563EB;
+  --accent-light: #60A5FA;
+  --accent-dark: #1D4ED8;
+  --accent-glow: rgba(96, 165, 250, 0.5);
+  /* Πιο έντονη λάμψη */
 
-  /* Jesper accent (orange) */
-  --brand-300: #ffb38a;
-  --brand-400: #ff8a4a;
-  --brand-500: #ff6a1a; /* main */
-  --brand-600: #e45510;
-  --brand-700: #b6400c;
+  /* Borders */
+  --border: rgba(148, 163, 184, 0.2);
+  --border-light: rgba(255, 255, 255, 0.1);
 
-  --ring: 0 0 0 2px;
-  --shadow-lg: 0 18px 55px rgba(0,0,0,.55);
+  /* Typography & Spacing */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
 
-  /* Jesper radius is smaller (less “rounded app”) */
-  --radius-lg: .9rem;
-  --radius-md: .75rem;
-  --pad: 1.1rem;
+  --container-max: 1200px;
+  --container-padding: 1.25rem;
+
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 25px var(--accent-glow);
+
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-
-/* Light mode (optional). Keep it readable but still “Jesper” */
-@media (prefers-color-scheme: light) {
-  :root{
-    color-scheme: light;
-    --bg: #000000;
-    --surface: rgba(10,10,10,.03);
-    --surface-strong: rgba(10,10,10,.05);
-    --border: rgba(10,10,10,.12);
-
-    --text: #0b0b0b;
-    --muted: rgba(11,11,11,.62);
+@media (min-width: 768px) {
+  :root {
+    --container-padding: 2.5rem;
   }
 }
 
-/* ===== Base ===== */
-html, body { height: 100%; }
+/* ==========================================================================
+   2. BASE STYLES & RESET
+   ========================================================================== */
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
 
-body{
-  background: #070707;
-  color: var(--text);
+body {
+  background: var(--bg-dark);
+  /* Default σκούρο φόντο για το theme σου */
+  color: var(--text-inverse);
+  /* Default λευκά γράμματα για να φαίνονται παντού */
+  font-family: var(--font-sans);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  position: relative;
+  overflow-x: hidden;
 }
 
-/* Jesper grain + subtle vignette */
-body::before{
-  content:"";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: .16;
-  background:
-    radial-gradient(900px 700px at 50% 0%, rgba(255,255,255,.06), transparent 60%),
-    radial-gradient(900px 700px at 50% 120%, rgba(255,255,255,.05), transparent 60%),
-    repeating-radial-gradient(circle at 20% 30%, rgba(255,255,255,.03) 0 1px, transparent 1px 3px),
-    repeating-linear-gradient(0deg, rgba(255,255,255,.02), rgba(255,255,255,.02) 1px, transparent 1px, transparent 3px);
-  mix-blend-mode: overlay;
+/* --- Η ΣΗΜΑΝΤΙΚΗ ΑΛΛΑΓΗ ΕΔΩ --- */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: inherit;
+  /* Κληρονομεί το χρώμα (λευκό ή μαύρο) ανάλογα που βρίσκεται */
+  margin-bottom: 1rem;
 }
 
-main,  footer, section{
-  position: relative;
-  z-index: 1;
+/* Fluid Typography */
+h1 {
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
 }
 
-header { isolation: isolate; }
-#site-menu { isolation: isolate; }
-/* selection */
-::selection{
-  background: color-mix(in srgb, var(--brand-500) 35%, transparent);
-  color: var(--text);
+h2 {
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
-/* scrollbar */
-*::-webkit-scrollbar{ height: 10px; width: 10px; }
-*::-webkit-scrollbar-thumb{
-  background: color-mix(in srgb, var(--border) 70%, transparent);
-  border-radius: 999px;
-}
-*::-webkit-scrollbar-thumb:hover{
-  background: color-mix(in srgb, var(--brand-500) 22%, var(--border));
+h3 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  line-height: 1.3;
 }
 
-/* =========================================================
-   Layout helpers
-   ========================================================= */
+h4 {
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+}
 
-.container-page{
+p {
+  margin-bottom: 1.5rem;
+  font-size: clamp(1rem, 1.1vw, 1.125rem);
+  color: inherit;
+  /* Κληρονομεί το χρώμα */
+  opacity: 0.9;
+  /* Ελαφριά διαφάνεια για στυλ */
+}
+
+/* ==========================================================================
+   3. LAYOUT & CONTAINER
+   ========================================================================== */
+.container-page {
   width: 100%;
-  max-width: 1080px;
-  margin-inline: auto;
-  padding-inline: 1rem;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
 }
 
-.section{
-  padding-block: clamp(2.8rem, 6vw, 5.2rem);
-  
+.section {
+  padding: 5rem 0;
 }
 
-.section-surface{
-  background: linear-gradient(180deg, rgba(255,255,255,.02) 0%, transparent 70%);
+@media (min-width: 1024px) {
+  .section {
+    padding: 8rem 0;
+  }
 }
 
-/* =========================================================
-   Typography (Jesper mood)
-   ========================================================= */
-
-.kicker{
-  text-transform: uppercase;
-  letter-spacing: .18em;
-  font-size: .72rem;
-  color: rgba(245,245,245,.55);
-}
-
-/* Jesper-like headline: uppercase + tighter tracking */
-.h1{
-  font-size: clamp(2.35rem, 6vw, 4.2rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: .95;
-  text-transform: uppercase;
-}
-
-/* paragraph in Jesper: smaller + airy */
-.lead{
-  font-size: 1rem;
-  line-height: 1.65;
-  color: var(--muted);
-  max-width: 62ch;
-}
-
-
-/* Page header */
-.page-header{ margin-bottom: 2rem; }
-.page-header h1{
-  font-size: clamp(1.8rem, 3.6vw, 2.4rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
-  text-transform: uppercase;
-}
-.page-header p{
-  color: var(--muted);
-  margin-top: .5rem;
-  max-width: 65ch;
-}
-
-/* Divider line */
-.divider{
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border), transparent);
-}
-
-/* Badge (editorial pill) */
-.badge{
-  display:inline-flex;
-  align-items:center;
-  gap:.45rem;
-
-  padding:.35rem .6rem;
-  border-radius:999px;
-
-  font-size:.72rem;
-  letter-spacing:.16em;
-  text-transform: uppercase;
-
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.03);
-  color: rgba(245,245,245,.72);
-}
-
-
-/* =========================================================
-   Cards / Tiles (less glass, more editorial)
-   ========================================================= */
-
-.card{
-  background: rgba(255,255,255,.03);
-  border: 1px solid rgba(255,255,255,.10);
+/* ==========================================================================
+   4. CARDS (Glass & Modern)
+   ========================================================================== */
+.card {
+  background: rgba(255, 255, 255, 0.03);
+  /* Πολύ απαλό λευκό για dark mode */
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
-  padding: var(--pad);
-  box-shadow: none;
-  backdrop-filter: none;
-}
-
-.card:hover{
-  border-color: color-mix(in srgb, var(--brand-500) 22%, rgba(255,255,255,.10));
-}
-
-.tile{
+  padding: 1.5rem;
+  transition: all 0.4s var(--ease-spring);
   position: relative;
   overflow: hidden;
-  transition: transform .25s ease, border-color .2s ease;
+  color: var(--text-inverse);
+  /* Λευκά γράμματα μέσα στην κάρτα */
 }
 
-.tile:hover{
-  transform: translateY(-3px);
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    border-color: var(--accent-light);
+    background: rgba(255, 255, 255, 0.08);
+    /* Λίγο πιο φωτεινό στο hover */
+  }
 }
 
-/* subtle inner glow on hover */
-.tile::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  opacity:0;
-  transition: opacity .18s ease;
-  background: radial-gradient(260px 260px at var(--mx,50%) var(--my,50%),
-    color-mix(in srgb, var(--brand-500) 18%, transparent),
-    transparent 62%);
-}
-.tile:hover::after{ opacity:1; }
-
-
-.tile[role="button"]:focus-visible{
-  box-shadow: var(--ring) color-mix(in srgb, var(--brand-500) 35%, transparent);
-  outline: none;
-}
-
-/* =========================================================
-   Forms (minimal)
-   ========================================================= */
-
-.form-modern label{
-  display: block;
-  font-size: .85rem;
-  color: var(--muted);
-  margin-bottom: .35rem;
-  text-transform: uppercase;
-  letter-spacing: .12em;
-}
-
-.form-modern input,
-.form-modern select,
-.form-modern textarea{
-  width: 100%;
-  border-radius: var(--radius-md);
-  background: rgba(255,255,255,.03);
-  border: 1px solid var(--border);
-  padding: .7rem .9rem;
+/* Αν χρειαστείς λευκή κάρτα με μαύρα γράμματα, βάλε αυτή την κλάση */
+.card-light {
+  background: white;
   color: var(--text);
-  outline: none;
-  transition: box-shadow .2s ease, border-color .2s ease, background-color .2s ease;
+  border: 1px solid var(--border);
 }
 
-.form-modern input::placeholder,
-.form-modern textarea::placeholder{
-  color: color-mix(in srgb, var(--muted) 90%, transparent);
+.card-light h1,
+.card-light h2,
+.card-light h3,
+.card-light p {
+  color: var(--text);
+  /* Επαναφορά σε μαύρο για λευκές κάρτες */
 }
 
-.form-modern input:focus,
-.form-modern select:focus,
-.form-modern textarea:focus{
-  border-color: color-mix(in srgb, var(--brand-500) 55%, var(--border));
-  box-shadow: var(--ring) color-mix(in srgb, var(--brand-500) 28%, transparent);
+/* Glassmorphism */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.6);
+  /* Σκούρο γυαλί */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.form-modern .error{
-  margin-top: .25rem;
-  font-size: .875rem;
-  color: var(--brand-400);
-}
-
-.form-modern .is-invalid{
-  border-color: color-mix(in srgb, var(--brand-600) 70%, transparent);
-  box-shadow: var(--ring) color-mix(in srgb, var(--brand-600) 30%, transparent);
-}
-
-/* =========================================================
-   Buttons
-   ========================================================= */
-
-/* Keep your old .btn classes for existing places (optional) */
-.btn{
+/* ==========================================================================
+   5. BUTTONS
+   ========================================================================== */
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: .5rem;
-  padding: .65rem 1.05rem;
+  padding: 0.875rem 2rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+}
+
+.btn-primary:hover {
+  background: var(--accent-dark);
+  box-shadow: 0 0 25px rgba(37, 99, 235, 0.6);
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.btn-outline:hover {
+  border-color: var(--accent);
+  background: rgba(37, 99, 235, 0.1);
+  color: white;
+}
+
+/* ==========================================================================
+   6. FORMS
+   ========================================================================== */
+.form-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  /* Σκούρο φόντο input */
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
-  font-weight: 700;
-  color: var(--text);
-  background: rgba(255,106,26,.14);
-  border: 1px solid color-mix(in srgb, var(--brand-500) 70%, rgba(255,255,255,.18));
-  transition: transform .08s ease, background-color .2s ease, border-color .2s ease;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
   outline: none;
-  text-transform: uppercase;
-  letter-spacing: .12em;
-  font-size: .82rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
 }
 
-.btn:hover{
-  background: rgba(255,106,26,.20);
-  border-color: var(--brand-500);
+/* ==========================================================================
+   7. UTILITIES
+   ========================================================================== */
+.text-gradient {
+  background: linear-gradient(135deg, #60A5FA 0%, #A78BFA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
-
-.btn:active{ transform: translateY(1px); }
-
-.btn:focus-visible{
-  box-shadow: var(--ring) color-mix(in srgb, var(--brand-500) 28%, transparent);
-}
-
-/* Secondary */
-.btn.secondary{
-  background: rgba(255,255,255,.03);
-  border: 1px solid rgba(255,255,255,.18);
-  color: var(--text);
-}
-.btn.secondary:hover{
-  background: rgba(255,255,255,.06);
-  border-color: rgba(255,255,255,.35);
-}
-
-/* Ghost */
-.btn.ghost{
-  background: transparent;
-  color: var(--text);
-  border: 1px solid rgba(255,255,255,.18);
-}
-.btn.ghost:hover{
-  background: rgba(255,255,255,.06);
-  border-color: rgba(255,255,255,.35);
-}
-
-/* Jesper pills (use this on menu + services actions) */
-.btn-jesper{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:.55rem;
-
-  padding:.72rem 1.15rem;
-  border-radius:999px;
-
-  font-weight:750;
-  font-size:.82rem;
-  letter-spacing:.14em;
-  text-transform: uppercase;
-
-  border:1px solid rgba(255,255,255,.25);
-  color: var(--text);
-  background: transparent;
-
-  transition: background-color .2s ease, border-color .2s ease, transform .08s ease;
-  outline:none;
-}
-
-.btn-jesper:hover{
-  border-color: rgba(255,255,255,.45);
-  background: rgba(255,255,255,.06);
-}
-
-
-.btn-jesper:active{ transform: translateY(1px); }
-
-.btn-jesper:focus-visible{
-  box-shadow: var(--ring) color-mix(in srgb, var(--text) 18%, transparent);
-}
-
-/* primary Jesper pill */
-.btn-jesper.primary{
-  border-color: color-mix(in srgb, var(--brand-500) 75%, rgba(255,255,255,.25));
-  color: var(--text);
-  background: rgba(255,106,26,.12);
-}
-
-.btn-jesper.primary:hover{
-  background: rgba(255,106,26,.18);
-  border-color: var(--brand-500);
-}
-
-.btn-jesper .arrow{
-  opacity:.85;
-  transition: transform .2s ease, opacity .2s ease;
-}
-.btn-jesper:hover .arrow{
-  transform: translateX(3px);
-  opacity:1;
-}
-
-/* =========================================================
-   Editorial service list helpers (if you use ServicesEditorial)
-   ========================================================= */
-
-.service-list{ border-top: 1px solid var(--border); }
-.service-row{
-  border-bottom: 1px solid var(--border);
-  padding: 1.1rem 0;
-  transition: background-color .2s ease;
-}
-.service-row:hover{ background: rgba(255,255,255,.03); }
-
-.service-title{
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-}
-.service-meta{
-  color: var(--muted);
-  font-size: .95rem;
-  line-height: 1.55;
-}
-
-.service-toggle{
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 999px;
-  padding: .4rem .75rem;
-  font-size: .78rem;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--text);
-  background: transparent;
-}
-.service-toggle:hover{
-  border-color: rgba(255,255,255,.35);
-  background: rgba(255,255,255,.05);
-}
-
-/* =========================================================
-   Optional circle CTA (Jesper “ALL PROJECTS” vibe)
-   ========================================================= */
-
-.circle-cta{
-  width: 118px;
-  height: 118px;
-  border-radius: 999px;
-  border: 2px solid rgba(255,106,26,.85);
-  display: grid;
-  place-items: center;
-  color: var(--text);
-  text-transform: uppercase;
-  letter-spacing: .14em;
-  font-size: .72rem;
-  background: rgba(0,0,0,.25);
-  box-shadow: 0 0 0 6px rgba(255,106,26,.10);
-}
-
-/* 1. Το menu ΠΑΝΩ από τα πάντα */
-#site-menu {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 2147483647 !important;
-
-  background: #070707 !important; /* απόλυτο μαύρο poster */
-  opacity: 1 !important;
-  isolation: isolate;
-}
-
-/* 2. ΚΟΒΕΙ grain / vignette / body overlays */
-body:has(#site-menu)::before {
-  display: none !important;
-}
-
-/* 3. ΚΟΒΕΙ ΟΛΑ τα absolute hero / background layers από κάτω */
-body:has(#site-menu) section > .absolute,
-body:has(#site-menu) .absolute.inset-0 {
-  display: none !important;
-}
-
-/* 4. Αντι-aliasing μόνο για menu (καθαρό typography) */
-#site-menu,
-#site-menu * {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* 5. ΑΣΦΑΛΕΙΑ: ποτέ pseudo overlays στο menu */
-#site-menu::before,
-#site-menu::after {
-  display: none !important;
-}
-
-/* =========================================================
-   HARD MENU OVERRIDE — hide site when menu is open
-   ========================================================= */
-
-/* Όταν υπάρχει ανοιχτό menu */
-body:has(#site-menu) main {
-  visibility: hidden !important;
-}
-
-/* Ασφάλεια: κανένα click / animation από κάτω */
-body:has(#site-menu) main * {
-  pointer-events: none !important;
-}
-
-/* Το menu πάντα ορατό */
-#site-menu {
-  visibility: visible !important;
-  pointer-events: auto !important;
-}
-
-select.select-dark option {
-  background: #0b0b0b;
-  color: #ffffff;
-}
-select.select-dark option:hover {
-  background: #ff6a1a;
-  color: #ffffff;
-}
-select.select-dark option:checked {
-  background: #ff6a1a;
-  color: #ffffff;
-}
-
-
-
-

@@ -1,34 +1,32 @@
 "use client";
 
+import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
 
-type Props = {
+interface RevealProps {
   children: React.ReactNode;
-  className?: string;
+  width?: "fit-content" | "100%";
   delay?: number;
-  y?: number;
-};
+  className?: string;
+}
 
-export default function Reveal({ children, className = "", delay = 0, y = 18 }: Props) {
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  // ✅ every time (not once)
-  const inView = useInView(ref, {
-    once: false,
-    margin: "-10% 0px -10% 0px",
-  });
+export const Reveal = ({ children, width = "fit-content", delay = 0, className = "" }: RevealProps) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-75px" }); // Ενεργοποιείται λίγο πριν φανεί τελείως
 
   return (
-    <motion.div
-      ref={ref}
-      className={className}
-      // ✅ όταν είναι έξω, γυρνάει πίσω (reset)
-      initial={{ opacity: 0, y, filter: "blur(6px)" }}
-      animate={inView ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y, filter: "blur(6px)" }}
-      transition={{ duration: 0.55, ease: [0.2, 0.8, 0.2, 1], delay }}
-    >
-      {children}
-    </motion.div>
+    <div ref={ref} style={{ width, position: "relative" }} className={className}>
+      <motion.div
+        variants={{
+          hidden: { opacity: 0, y: 75 },
+          visible: { opacity: 1, y: 0 },
+        }}
+        initial="hidden"
+        animate={isInView ? "visible" : "hidden"}
+        transition={{ duration: 0.8, delay: delay, ease: [0.25, 0.25, 0, 1] }} // Πολύ smooth easing
+      >
+        {children}
+      </motion.div>
+    </div>
   );
-}
+};

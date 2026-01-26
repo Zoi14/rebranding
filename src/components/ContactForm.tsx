@@ -1,142 +1,306 @@
-// ============================================================================
-// FILE: src/components/ContactForm.tsx  (μένει όπως το έχεις λειτουργικά,
-//        απλώς χρησιμοποιεί τις κλάσεις .card/.btn/.form-modern που ορίσαμε)
-// ============================================================================
 "use client";
 import React, { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
+// Συγχρονισμένα services με το ServicesGrid για συνέπεια
 const SERVICE_OPTIONS = [
-  "Διαχείριση Social Media","Design για Social Media","Content Creation (Video & Photo)",
-  "Web Design & Κατασκευή Ιστοσελίδας","Δωρεάν Αξιολόγηση",
+  "Social Media Management",
+  "Content Creation (Video & Photo)",
+  "Web Design & Development",
+  "Video Editing",
+  "Rebranding / Redesign",
+  "Άλλο / Δωρεάν Αξιολόγηση",
 ];
 
 type Status = "idle" | "sending" | "success" | "error";
 
 export default function ContactForm() {
   const params = useSearchParams();
+
   const initialService = useMemo(() => {
     const v = params.get("service");
-    try { return v ? decodeURIComponent(v) : ""; } catch { return v || ""; }
+    // Αντιστοίχιση του ID από το URL με το πλήρες όνομα της υπηρεσίας
+    if (v === "social") return "Social Media Management";
+    if (v === "content") return "Content Creation (Video & Photo)";
+    if (v === "video") return "Video Editing";
+    if (v === "web") return "Web Design & Development";
+    if (v === "redesign") return "Rebranding / Redesign";
+    if (v === "design") return "Social Media Management"; // Fallback mapping based on id
+    return "";
   }, [params]);
 
-  const [form, setForm] = useState({ fullName: "", email: "", phone: "", service: initialService, message: "" });
+  const [form, setForm] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    service: initialService,
+    message: "",
+  });
+
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
 
-  const errors = React.useMemo(() => {
+  const errors = useMemo(() => {
     const e: Record<string, string> = {};
     if (!form.fullName.trim()) e.fullName = "Πες μου το όνομά σου.";
-    if (!form.email.trim()) e.email = "Χρειάζομαι email για να απαντήσω.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Βάλε ένα έγκυρο email.";
-    if (form.phone && form.phone.replace(/\D/g, "").length < 8) e.phone = "Βάλε ένα έγκυρο τηλέφωνο (προαιρετικό).";
-    if (!form.message.trim()) e.message = "Γράψε λίγες λεπτομέρειες για το τι χρειάζεσαι.";
+    if (!form.email.trim()) e.email = "Το email είναι απαραίτητο.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+      e.email = "Μη έγκυρη μορφή email.";
+    if (form.phone && form.phone.replace(/\D/g, "").length < 8)
+      e.phone = "Έλεγξε τον αριθμό τηλεφώνου.";
+    if (!form.message.trim())
+      e.message = "Γράψε μου λίγα λόγια για το project.";
     return e;
   }, [form]);
 
   const isValid = Object.keys(errors).length === 0;
-  const showError = (n: string) => touched[n] && errors[n];
 
-  function onChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
-    const { name, value } = e.target; setForm((p) => ({ ...p, [name]: value }));
+  // Safe accessor to handle boolean | string return
+  const getError = (n: string): string | undefined => {
+    return touched[n] && errors[n] ? errors[n] : undefined;
+  };
+
+  function onChange(
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) {
+    const { name, value } = e.target;
+    setForm((p) => ({ ...p, [name]: value }));
   }
-  function onBlur(e: React.FocusEvent<HTMLElement>) {
-    const name = (e.target as HTMLInputElement).name; setTouched((p) => ({ ...p, [name]: true }));
+
+  function onBlur(e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+    const { name } = e.target;
+    setTouched((p) => ({ ...p, [name]: true }));
   }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setTouched({ fullName: true, email: true, phone: true, service: true, message: true });
-    if (!isValid) { setStatus("error"); setError("Έλεγξε τα πεδία με κόκκινο και δοκίμασε ξανά."); return; }
-    setStatus("sending"); setError("");
+    setTouched({
+      fullName: true,
+      email: true,
+      phone: true,
+      service: true,
+      message: true,
+    });
+
+    if (!isValid) {
+      setStatus("error");
+      setError("Παρακαλώ διόρθωσε τα πεδία με κόκκινο.");
+      return;
+    }
+
+    setStatus("sending");
+    setError("");
+
     try {
-      const resp = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+      const resp = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
       const data = await resp.json().catch(() => ({}));
-      if (!resp.ok || !data?.ok) throw new Error(data?.error || `HTTP ${resp.status}`);
+
+      if (!resp.ok || !data?.ok)
+        throw new Error(data?.error || `HTTP ${resp.status}`);
+
       setStatus("success");
       setForm({ fullName: "", email: "", phone: "", service: "", message: "" });
       setTouched({});
     } catch (err: any) {
       console.error("submit failed:", err?.message);
-      setStatus("error"); setError(err?.message || "Δεν στάλθηκε. Δοκίμασε ξανά.");
+      setStatus("error");
+      setError(err?.message || "Κάτι πήγε στραβά. Δοκίμασε ξανά.");
     }
   }
 
+  // Styles για τα Inputs (επαναχρησιμοποιούμενα)
+  const inputClasses = (errorText: string | undefined) => `
+    w-full bg-white/[0.03] border rounded-lg px-4 py-3.5 text-white placeholder-slate-500
+    transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50
+    ${errorText
+      ? "border-red-500/50 focus:border-red-500"
+      : "border-white/10 focus:border-blue-500 hover:border-white/20"
+    }
+  `;
+
+  const labelClasses = "block text-xs font-bold uppercase tracking-widest text-blue-300 mb-2";
+
   return (
-    <section className="card container-page">
-      <header className="page-header">
-        <h1>Επικοινωνία</h1>
-        <p>Συμπλήρωσε τη φόρμα και θα σου απαντήσω σύντομα.</p>
-      </header>
+    <div className="w-full max-w-3xl mx-auto p-6 md:p-10 rounded-3xl bg-[#0F172A] border border-white/5 shadow-2xl relative overflow-hidden">
 
-      <form className="form-modern" onSubmit={onSubmit} noValidate>
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="fullName">Ονοματεπώνυμο</label>
-            <input id="fullName" name="fullName" placeholder="π.χ. Μαρία Παπαδοπούλου"
-                   value={form.fullName} onChange={onChange} onBlur={onBlur}
-                   className={showError("fullName") ? "is-invalid" : ""}/>
-            {showError("fullName") && <div className="error">{errors.fullName}</div>}
-          </div>
-          <div>
-            <label htmlFor="email">Email</label>
-            <input id="email" name="email" type="email" placeholder="π.χ. name@email.com"
-                   value={form.email} onChange={onChange} onBlur={onBlur}
-                   className={showError("email") ? "is-invalid" : ""}/>
-            {showError("email") && <div className="error">{errors.email}</div>}
-          </div>
-        </div>
+      {/* Background Glow Effect */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none" />
 
-        <div className="grid sm:grid-cols-2 gap-4 mt-4">
-          <div>
-            <label htmlFor="phone">Τηλέφωνο (προαιρετικό)</label>
-            <input id="phone" name="phone" placeholder="π.χ. 69xxxxxxx"
-                   value={form.phone} onChange={onChange} onBlur={onBlur}
-                   className={showError("phone") ? "is-invalid" : ""}/>
-            {showError("phone") && <div className="error">{errors.phone}</div>}
-          </div>
-          <div>
-            <label htmlFor="service">Υπηρεσία (optional)</label>
-            <select
-  className="select-dark w-full rounded-xl border border-white/10 bg-zinc-900 text-white px-4 py-3"
-  id="service"
-  name="service"
-  value={form.service}
-  onChange={onChange}
-  onBlur={onBlur}
->
-  <option value="">Διάλεξε υπηρεσία</option>
-  {SERVICE_OPTIONS.map((s) => (
-    <option key={s} value={s}>
-      {s}
-    </option>
-  ))}
-</select>
+      <form className="relative z-10 space-y-8" onSubmit={onSubmit} noValidate>
 
+        {/* Row 1: Name & Email */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="group">
+            <label htmlFor="fullName" className={labelClasses}>Ονοματεπωνυμο</label>
+            <input
+              id="fullName"
+              name="fullName"
+              placeholder="π.χ. Μαρία Παπαδοπούλου"
+              value={form.fullName}
+              onChange={onChange}
+              onBlur={onBlur}
+              className={inputClasses(getError("fullName"))}
+            />
+            {getError("fullName") && (
+              <span className="text-xs text-red-400 mt-1 block animate-pulse">{errors.fullName}</span>
+            )}
+          </div>
+
+          <div className="group">
+            <label htmlFor="email" className={labelClasses}>Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="name@email.com"
+              value={form.email}
+              onChange={onChange}
+              onBlur={onBlur}
+              className={inputClasses(getError("email"))}
+            />
+            {getError("email") && <span className="text-xs text-red-400 mt-1 block animate-pulse">{errors.email}</span>}
           </div>
         </div>
 
-        <div className="mt-4">
-          <label htmlFor="message">Μήνυμα</label>
-          <textarea id="message" name="message" rows={5}
-                    placeholder="Πες μου τι χρειάζεσαι, στόχο, deadline, και ό,τι άλλο βοηθάει."
-                    value={form.message} onChange={onChange} onBlur={onBlur}
-                    className={showError("message") ? "is-invalid" : ""}/>
-          {showError("message") && <div className="error">{errors.message}</div>}
+        {/* Row 2: Phone & Service */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="group">
+            <label htmlFor="phone" className={labelClasses}>Τηλεφωνο (Προαιρετικο)</label>
+            <input
+              id="phone"
+              name="phone"
+              placeholder="π.χ. 69xxxxxxx"
+              value={form.phone}
+              onChange={onChange}
+              onBlur={onBlur}
+              className={inputClasses(getError("phone"))}
+            />
+            {getError("phone") && <span className="text-xs text-red-400 mt-1 block animate-pulse">{errors.phone}</span>}
+          </div>
+
+          <div className="group">
+            <label htmlFor="service" className={labelClasses}>Ενδιαφερομαι για</label>
+            <div className="relative">
+              <select
+                id="service"
+                name="service"
+                value={form.service}
+                onChange={onChange}
+                onBlur={onBlur}
+                className={`${inputClasses(getError("service"))} appearance-none cursor-pointer`}
+                style={{ backgroundColor: "#0F172A" }} // Fix for dark dropdown options
+              >
+                <option value="" disabled className="text-slate-500">Διάλεξε υπηρεσία</option>
+                {SERVICE_OPTIONS.map((s) => (
+                  <option key={s} value={s} className="bg-[#0F172A] text-white py-2">
+                    {s}
+                  </option>
+                ))}
+              </select>
+              {/* Custom Arrow Icon */}
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </div>
+            </div>
+            {getError("service") && (
+              <span className="text-xs text-red-400 mt-1 block animate-pulse">{errors.service}</span>
+            )}
+          </div>
         </div>
 
-        {status === "error" && <div className="error mt-3">{error}</div>}
+        {/* Row 3: Message */}
+        <div className="group">
+          <label htmlFor="message" className={labelClasses}>Το Μηνυμα σου</label>
+          <textarea
+            id="message"
+            name="message"
+            rows={5}
+            placeholder="Πες μου για το project σου, τους στόχους και το deadline..."
+            value={form.message}
+            onChange={onChange}
+            onBlur={onBlur}
+            className={inputClasses(getError("message"))}
+          />
+          {getError("message") && (
+            <span className="text-xs text-red-400 mt-1 block animate-pulse">{errors.message}</span>
+          )}
+        </div>
 
-        <div className="actions">
-          <button className="btn" type="submit" disabled={status === "sending"}>
-            {status === "sending" ? "Αποστολή..." : "Αποστολή"}
+        {/* Global Error Message */}
+        {status === "error" && (
+          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm text-center">
+            {error}
+          </div>
+        )}
+
+        {/* Submit Actions */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
+          <button
+            type="submit"
+            disabled={status === "sending" || status === "success"}
+            className="w-full sm:w-auto px-10 py-4 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase tracking-widest transition-all shadow-[0_0_20px_-5px_rgba(37,99,235,0.5)] hover:shadow-[0_0_30px_-5px_rgba(37,99,235,0.7)] hover:-translate-y-1 disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+          >
+            {status === "sending" ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Αποστολη...
+              </>
+            ) : status === "success" ? (
+              <>
+                <span className="text-green-300">✓</span> Σταλθηκε
+              </>
+            ) : (
+              "Αποστολη μηνυματος"
+            )}
           </button>
-          <a className="btn secondary" href="mailto:rebrandingbyzoe@gmail.com">Email</a>
+
+          <a
+            href="mailto:rebrandingbyzoe@gmail.com"
+            className="text-sm text-slate-400 hover:text-white transition-colors border-b border-transparent hover:border-blue-400"
+          >
+            ή στείλε email απευθείας
+          </a>
         </div>
 
-        {status === "success" && <div className="form-success">Στάλθηκε ✅ Θα λάβεις απάντηση σύντομα.</div>}
+        {/* Success Animation */}
+        <AnimatePresence>
+          {status === "success" && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0F172A]/95 backdrop-blur-sm rounded-3xl"
+            >
+              <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 mb-4 border border-green-500/30">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-display font-medium text-white mb-2">Ευχαριστώ!</h3>
+              <p className="text-slate-400 text-center max-w-xs">
+                Έλαβα το μήνυμά σου και θα επικοινωνήσω μαζί σου το συντομότερο.
+              </p>
+              <button
+                onClick={() => setStatus('idle')}
+                className="mt-8 text-sm text-blue-400 hover:text-white transition-colors uppercase tracking-widest font-bold"
+              >
+                Νεο Μηνυμα
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
       </form>
-    </section>
+    </div>
   );
 }

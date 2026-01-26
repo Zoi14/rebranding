@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { sans, display } from "./fonts";
 import Nav from "../components/Nav";
+import ScrollReveal from "../components/ScrollReveal";
 import { SITE, defaultOpenGraph, siteUrl } from "./lib/seo";
 import { OrganizationJsonLd, WebSiteJsonLd } from "./lib/jsonld";
 
@@ -29,10 +30,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="el" suppressHydrationWarning>
       <body className={`${sans.variable} ${display.variable} font-sans`}>
+        <ScrollReveal />
         <Nav />
         <OrganizationJsonLd />
         <WebSiteJsonLd />
-        <main className="pt-14">{children}</main>
+        <main>{children}</main>
       </body>
     </html>
   );

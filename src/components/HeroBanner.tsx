@@ -1,8 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { useRef } from "react";
 
 type Props = {
   kicker?: string;
@@ -16,42 +12,11 @@ export default function HeroBanner({
   kicker = "Creative Studio",
   title,
   subtitle,
-  imageUrl = "/img/hero.PNG",
+  imageUrl = "/img/hero.png",
   videoUrl,
 }: Props) {
-  const wrapRef = useRef<HTMLDivElement | null>(null);
-
-  // mouse-based parallax
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const sx = useSpring(mx, { stiffness: 160, damping: 20 });
-  const sy = useSpring(my, { stiffness: 160, damping: 20 });
-
-  // subtle 3D rotation for the whole content block
-  const rotateY = useTransform(sx, [-0.5, 0.5], [-10, 10]);
-  const rotateX = useTransform(sy, [-0.5, 0.5], [10, -10]);
-
-  // little drifting glow behind
-  const glowX = useTransform(sx, [-0.5, 0.5], ["-8%", "8%"]);
-  const glowY = useTransform(sy, [-0.5, 0.5], ["-6%", "6%"]);
-
-  function onMove(e: React.MouseEvent) {
-    const el = wrapRef.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    mx.set(px);
-    my.set(py);
-  }
-
-  function onLeave() {
-    mx.set(0);
-    my.set(0);
-  }
-
   return (
-    <section className="relative min-h-[86vh] w-full overflow-hidden">
+    <section className="relative min-h-[85vh] w-full overflow-hidden flex items-center">
       {/* Background */}
       <div className="absolute inset-0">
         {videoUrl ? (
@@ -71,111 +36,88 @@ export default function HeroBanner({
           />
         )}
 
+        {/* Overlay - professional blue gradient */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(10,10,10,.65) 0%, rgba(10,10,10,.78) 55%, rgba(10,10,10,.92) 100%)",
+              "linear-gradient(180deg, rgba(15,23,42,.55) 0%, rgba(15,23,42,.70) 50%, rgba(15,23,42,.85) 100%)",
           }}
         />
       </div>
 
       {/* Content */}
-      <div
-        ref={wrapRef}
-        onMouseMove={onMove}
-        onMouseLeave={onLeave}
-        className="relative container-page section"
-        style={{ perspective: 1200 }}
-      >
-        <motion.div
-          style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-          className="max-w-3xl"
-        >
-          {/* moving glow blob */}
-          <motion.div
-            aria-hidden
-            style={{ x: glowX, y: glowY }}
-            className="pointer-events-none absolute -left-24 -top-24 h-[320px] w-[320px] rounded-full blur-3xl opacity-25"
-          />
-
-          <p className="kicker">{kicker}</p>
-
-          {/* 3D Title */}
-          <div className="relative mt-3">
-            {/* back layers (depth) */}
-            <motion.h1
-              aria-hidden
-              className="h1 absolute inset-0 select-none opacity-30"
-              style={{
-                transform: "translateZ(-40px) translateY(8px)",
-                filter: "blur(0.6px)",
-              }}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 0.28, y: 0 }}
-              transition={{ duration: 0.55 }}
+      <div className="relative container-page py-20">
+        <div className="max-w-3xl">
+          {/* Kicker with decorative gold line */}
+          <div className="flex items-center gap-3">
+            <span
+              className="w-8 h-px"
+              style={{ background: "var(--accent)" }}
+            />
+            <p
+              className="text-xs font-medium uppercase tracking-widest"
+              style={{ color: "var(--accent)", letterSpacing: "0.2em" }}
             >
-              {title}
-            </motion.h1>
-
-            <motion.h1
-              aria-hidden
-              className="h1 absolute inset-0 select-none opacity-20"
-              style={{
-                transform: "translateZ(-20px) translateY(4px)",
-                filter: "blur(0.25px)",
-              }}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 0.2, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.03 }}
-            >
-              {title}
-            </motion.h1>
-
-            {/* front layer */}
-            <motion.h1
-              className="h1 relative"
-              style={{ transform: "translateZ(25px)" }}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45 }}
-            >
-              {title}
-            </motion.h1>
+              {kicker}
+            </p>
           </div>
 
-          <motion.p
-            className="lead mt-5"
-            style={{ transform: "translateZ(18px)" }}
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.05 }}
+          {/* Title with display font */}
+          <h1
+            className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-display font-medium leading-tight"
+            style={{ color: "white", letterSpacing: "-0.02em" }}
+          >
+            {title}
+          </h1>
+
+          <p
+            className="mt-6 text-lg sm:text-xl max-w-xl leading-relaxed"
+            style={{ color: "rgba(255,255,255,0.75)" }}
           >
             {subtitle}
-          </motion.p>
+          </p>
 
-          <motion.div
-            className="mt-7 flex flex-wrap gap-3"
-            style={{ transform: "translateZ(18px)" }}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.12 }}
-          >
-            <Link href="/contact" className="btn">
+          <div className="mt-10 flex flex-wrap gap-4">
+            {/* Primary CTA */}
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 px-8 py-4 text-xs font-medium uppercase tracking-widest transition-all duration-300 hover:opacity-90"
+              style={{
+                background: "var(--accent)",
+                color: "white",
+                letterSpacing: "0.15em",
+              }}
+            >
               Ζήτησε προσφορά
             </Link>
 
+            {/* Secondary CTA */}
             <a
-              className="btn secondary"
               href="https://instagram.com/rebranding_byzoe"
               target="_blank"
               rel="noreferrer"
+              className="inline-flex items-center gap-2 px-8 py-4 text-xs font-medium uppercase tracking-widest transition-all duration-300 hover:bg-white hover:text-[var(--bg-dark)]"
+              style={{
+                background: "transparent",
+                color: "white",
+                border: "1px solid rgba(255,255,255,0.4)",
+                letterSpacing: "0.15em",
+              }}
             >
               Instagram
             </a>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
+
+      {/* Decorative gold accent */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-px opacity-30"
+        style={{
+          background: "linear-gradient(90deg, transparent, var(--accent), transparent)",
+        }}
+      />
     </section>
   );
 }

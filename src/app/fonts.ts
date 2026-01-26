@@ -1,5 +1,5 @@
 // FILE: src/app/fonts.ts
-import { Noto_Sans, Space_Grotesk } from "next/font/google";
+import { Noto_Sans, Playfair_Display } from "next/font/google";
 
 /* Body font with full Greek support */
 export const sans = Noto_Sans({
@@ -8,9 +8,10 @@ export const sans = Noto_Sans({
   display: "swap",
 });
 
-/* Display font (latin only). Greek will fallback to --font-sans */
-export const display = Space_Grotesk({
+/* Display font — Luxury serif for headings (latin only). Greek will fallback to --font-sans */
+export const display = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
+  weight: ["400", "500", "600", "700"],
 });

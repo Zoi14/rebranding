@@ -1,14 +1,10 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from "framer-motion";
-import Reveal from "@/components/Reveal";
+import { useMemo, useState, useEffect } from "react";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { Reveal } from "@/components/Reveal";
+import { StaggerContainer, StaggerItem } from "@/components/StaggerContainer";
 
 type Service = {
   id: string;
@@ -24,130 +20,179 @@ type Service = {
 
 function ServiceCard({
   s,
-  isOpen,
-  onToggle,
-  children,
+  onClick,
 }: {
   s: Service;
-  isOpen: boolean;
-  onToggle: () => void;
-  children?: React.ReactNode;
+  onClick: () => void;
 }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-
-  const sx = useSpring(mx, { stiffness: 160, damping: 18 });
-  const sy = useSpring(my, { stiffness: 160, damping: 18 });
-
-  const rotateY = useTransform(sx, [-0.5, 0.5], [-10, 10]);
-  const rotateX = useTransform(sy, [-0.5, 0.5], [10, -10]);
-
-  const glowX = useTransform(sx, [-0.5, 0.5], ["35%", "65%"]);
-  const glowY = useTransform(sy, [-0.5, 0.5], ["30%", "70%"]);
-
-  function onMove(e: React.MouseEvent) {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    mx.set(px);
-    my.set(py);
-  }
-
-  function onLeave() {
-    mx.set(0);
-    my.set(0);
-  }
-
   return (
-    <div style={{ perspective: 1200 }}>
-      <motion.div
-        ref={ref}
-        onMouseMove={onMove}
-        onMouseLeave={onLeave}
-        onClick={onToggle}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") onToggle();
-        }}
-        aria-expanded={isOpen}
-        className="card tile relative overflow-hidden"
-        style={{
-          cursor: "pointer",
-          rotateX,
-          rotateY,
-          transformStyle: "preserve-3d",
-        }}
-        whileHover={{ scale: 1.01 }}
-        transition={{ duration: 0.15 }}
-      >
-        {/* moving highlight */}
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-40"
-          style={{
-            background: useTransform([glowX, glowY], ([x, y]) => {
-              return `radial-gradient(420px circle at ${x} ${y}, rgba(255,255,255,.12), transparent 55%)`;
-            }),
-          }}
-        />
-
-        {/* subtle border glow */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            boxShadow:
-              "inset 0 0 0 1px color-mix(in srgb, var(--border) 80%, transparent)",
-            opacity: 0.9,
-          }}
-        />
-
-        {/* content lifted a bit */}
-        <div style={{ transform: "translateZ(18px)" }} className="relative">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h3 className="text-lg font-semibold">{s.title}</h3>
-              <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-                {s.desc}
-              </p>
-            </div>
-
-            <motion.span
-              className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-lg border"
-              style={{
-                borderColor: "var(--border)",
-                background:
-                  "color-mix(in srgb, var(--surface-strong) 80%, transparent)",
-              }}
-              aria-hidden
-              animate={{ rotate: isOpen ? 180 : 0, scale: isOpen ? 1.03 : 1 }}
-              transition={{ duration: 0.2 }}
-            >
-              {isOpen ? "−" : "+"}
-            </motion.span>
+    <motion.div
+      whileHover={{ y: -5 }}
+      onClick={onClick}
+      className={`group relative overflow-hidden border border-white/10 bg-white/[0.03] hover:border-blue-400/30 hover:bg-white/[0.06] rounded-2xl cursor-pointer h-full transition-colors duration-300`}
+    >
+      <div className="p-6 md:p-8 flex flex-col h-full">
+        {/* Header */}
+        <div className="flex justify-between items-start gap-4">
+          <div className="flex-1">
+            <h3 className="text-xl md:text-2xl font-display font-medium text-white group-hover:text-blue-400 transition-colors duration-300 leading-tight">
+              {s.title}
+            </h3>
+            <p className="mt-3 text-sm md:text-base text-slate-400 leading-relaxed font-light">
+              {s.desc}
+            </p>
           </div>
 
-          <div className="mt-4 divider" />
+          {/* Arrow Icon */}
+          <div className="mt-1 flex-shrink-0 ml-2 text-white/20 group-hover:text-blue-400 transition-colors duration-300">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="transform -rotate-45 group-hover:rotate-0 transition-transform duration-300">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </div>
+        </div>
 
-          <ul className="mt-4 space-y-2 text-sm">
-            {s.bullets.map((b) => (
-              <li key={b} className="flex items-start gap-2">
-                <span
-                  aria-hidden
-                  className="mt-1 h-1.5 w-1.5 rounded-full"
-                  style={{ background: "var(--brand-500)" }}
-                />
-                <span>{b}</span>
-              </li>
-            ))}
-          </ul>
+        {/* Divider */}
+        <div className="mt-6 mb-6 h-px w-full bg-white/5 group-hover:bg-blue-500/30 transition-colors duration-300" />
 
-          {children}
+        {/* Bullets Preview */}
+        <ul className="space-y-3 mt-auto">
+          {s.bullets.map((b) => (
+            <li key={b} className="flex items-center gap-3 text-sm text-slate-300 group-hover:text-white transition-colors">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500/50 group-hover:bg-blue-400 flex-shrink-0" />
+              <span>{b}</span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-8 pt-4 border-t border-white/5 flex items-center text-xs font-bold uppercase tracking-widest text-slate-500 group-hover:text-blue-400 transition-colors">
+          <span>View Details</span>
+          <span className="ml-2">→</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function ServiceModal({ s, onClose }: { s: Service; onClose: () => void }) {
+  // Lock body scroll
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = "auto"; };
+  }, []);
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-[#0F172A]/90 backdrop-blur-md"
+      />
+
+      {/* Modal Content */}
+      <motion.div
+        layoutId={`modal-${s.id}`}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-[#0B1121] border border-white/10 rounded-3xl shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Sticky Header with Close Button */}
+        <div className="sticky top-0 right-0 z-10 flex justify-end p-4 bg-gradient-to-b from-[#0B1121] to-transparent">
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="px-6 md:px-12 pb-12">
+          {/* Header */}
+          <div className="mb-10">
+            <h2 className="text-3xl md:text-5xl font-display font-medium text-white mb-4">
+              {s.title}
+            </h2>
+            <p className="text-lg md:text-xl text-slate-400 font-light max-w-2xl">
+              {s.desc}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12">
+
+            {/* Left Column: Details */}
+            <div className="space-y-10">
+              {/* Includes */}
+              <div>
+                <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-400 mb-6">
+                  <span className="w-8 h-px bg-blue-500"></span>
+                  Τι περιλαμβανει
+                </h4>
+                <ul className="space-y-4">
+                  {s.details.includes.map((x) => (
+                    <li key={x} className="flex items-start gap-3 text-base text-slate-200">
+                      <svg className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>
+                      <span>{x}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Right Column: Ideal For & Deliverables */}
+            <div className="space-y-8">
+              <div className="p-8 rounded-2xl bg-white/[0.03] border border-white/5">
+                <div className="mb-8">
+                  <h4 className="text-xs font-bold uppercase tracking-[0.15em] text-white/60 mb-4">Ιδανικο για</h4>
+                  <ul className="space-y-3">
+                    {s.details.idealFor.map((x) => (
+                      <li key={x} className="flex items-start gap-2 text-sm text-slate-300">
+                        <span className="text-blue-500 mt-1 flex-shrink-0">•</span>
+                        <span>{x}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-[0.15em] text-white/60 mb-4">Παραδοτεα</h4>
+                  <ul className="space-y-3">
+                    {s.details.deliverables.map((x) => (
+                      <li key={x} className="flex items-start gap-2 text-sm text-slate-300">
+                        <span className="text-green-400 mt-1 flex-shrink-0">✓</span>
+                        <span>{x}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* CTAs */}
+              <div className="flex flex-col gap-4">
+                <Link
+                  href="/contact"
+                  className="w-full text-center px-6 py-4 rounded-full bg-blue-600 hover:bg-blue-500 text-sm font-bold uppercase tracking-widest text-white transition-all hover:scale-[1.02]"
+                >
+                  Ζητησε Προσφορα
+                </Link>
+                <a
+                  href="https://instagram.com/rebranding_byzoe"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full text-center px-6 py-4 rounded-full border border-white/10 hover:bg-white/5 text-sm font-bold uppercase tracking-widest text-slate-300 transition-all"
+                >
+                  DM στο Instagram
+                </a>
+              </div>
+            </div>
+
+          </div>
         </div>
       </motion.div>
     </div>
@@ -155,8 +200,6 @@ function ServiceCard({
 }
 
 export default function ServicesGrid() {
-  const IG_USERNAME = "rebranding_byzoe";
-
   const services: Service[] = useMemo(
     () => [
       {
@@ -270,98 +313,56 @@ export default function ServicesGrid() {
     []
   );
 
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
 
   return (
-    <section className="section" aria-label="Υπηρεσίες">
-      <div className="container-page">
-        <div className="page-header">
-          <span className="badge">Υπηρεσίες</span>
-          <h2 className="mt-3 text-2xl sm:text-3xl font-semibold tracking-tight">
-            Πάτα σε μια υπηρεσία για λεπτομέρειες
-          </h2>
-          <p className="mt-2" style={{ color: "var(--muted)" }}>
-            Κάθε κάρτα ανοίγει για να δεις τι περιλαμβάνει, για ποιον είναι και τι παραδίδω.
-          </p>
-        </div>
+    <section className="section bg-[#0F172A] py-40 lg:py-80" aria-label="Υπηρεσίες">
+      <div className="container-page px-6 mx-auto max-w-7xl">
 
-        <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {services.map((s, i) => {
-            const isOpen = openId === s.id;
+        {/* Header */}
+        <Reveal>
+          <div className="mb-20">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="w-12 h-px bg-blue-500"></span>
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-blue-400">
+                Our Services
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-6xl font-display font-medium text-white mb-6 leading-tight">
+              Επίλεξε την <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                ιδανική λύση
+              </span> για εσένα.
+            </h2>
+            <p className="text-lg text-slate-400 max-w-2xl font-light leading-relaxed">
+              Κάνε κλικ σε κάθε κάρτα για να δεις αναλυτικά τι περιλαμβάνει,
+              σε ποιον απευθύνεται και τι ακριβώς θα παραλάβεις.
+            </p>
+          </div>
+        </Reveal>
 
-            return (
-              <Reveal key={s.id} delay={i * 0.06} y={22}>
-                <ServiceCard
-                  s={s}
-                  isOpen={isOpen}
-                  onToggle={() => setOpenId((cur) => (cur === s.id ? null : s.id))}
-                >
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.22 }}
-                        className="overflow-hidden"
-                        onClick={(e) => e.stopPropagation()}
-                        style={{ transform: "translateZ(14px)" }}
-                      >
-                        <div className="mt-5 space-y-4">
-                          <div>
-                            <p className="text-sm font-semibold">Τι περιλαμβάνει</p>
-                            <ul className="mt-2 space-y-2 text-sm" style={{ color: "var(--muted)" }}>
-                              {s.details.includes.map((x) => (
-                                <li key={x}>• {x}</li>
-                              ))}
-                            </ul>
-                          </div>
+        {/* Grid */}
+        <StaggerContainer className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {services.map((s) => (
+            <StaggerItem key={s.id} className="h-full">
+              <ServiceCard
+                s={s}
+                onClick={() => setSelectedService(s)}
+              />
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
 
-                          <div>
-                            <p className="text-sm font-semibold">Ιδανικό για</p>
-                            <ul className="mt-2 space-y-2 text-sm" style={{ color: "var(--muted)" }}>
-                              {s.details.idealFor.map((x) => (
-                                <li key={x}>• {x}</li>
-                              ))}
-                            </ul>
-                          </div>
+        {/* Modal */}
+        <AnimatePresence>
+          {selectedService && (
+            <ServiceModal
+              s={selectedService}
+              onClose={() => setSelectedService(null)}
+            />
+          )}
+        </AnimatePresence>
 
-                          <div>
-                            <p className="text-sm font-semibold">Παραδοτέα</p>
-                            <ul className="mt-2 space-y-2 text-sm" style={{ color: "var(--muted)" }}>
-                              {s.details.deliverables.map((x) => (
-                                <li key={x}>• {x}</li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <p className="text-xs" style={{ color: "var(--muted)" }}>
-                            Η τιμολόγηση προσαρμόζεται στις ανάγκες του κάθε project.
-                          </p>
-
-                          <div className="pt-3 flex flex-wrap gap-3">
-                            <a
-                              href={`https://instagram.com/${IG_USERNAME}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="btn-jesper"
-                            >
-                              Instagram DM <span className="arrow">→</span>
-                            </a>
-
-                            <a href="/contact" className="btn-jesper primary">
-                              Ζήτησε προσφορά <span className="arrow">→</span>
-                            </a>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </ServiceCard>
-              </Reveal>
-            );
-          })}
-        </div>
       </div>
     </section>
   );
