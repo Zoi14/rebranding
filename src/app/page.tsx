@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 import HeroBanner from "@/components/HeroBanner";
 import SplineHero from "@/components/SplineHero";
