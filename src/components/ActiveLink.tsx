@@ -20,7 +20,7 @@ export default function ActiveLink({ href, exact = false, className = "", childr
     ? pathname === href
     : exact
       ? pathname === href
-      : pathname.startsWith(href);
+      : (pathname || "").startsWith(href);
 
   return (
     <Link
