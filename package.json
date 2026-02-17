@@ -18,7 +18,12 @@
     "fs-extra": "^11.3.3",
     "next": "16.1.0",
     "react": "19.2.3",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "19.2.3",
+    "slate": "^0.123.0",
+    "slate-history": "^0.113.1",
+    "slate-react": "^0.123.0",
     "three": "^0.182.0",
     "tinacms": "^3.4.1"
   },
