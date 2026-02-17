@@ -19,9 +19,7 @@ export default function ContactForm() {
   const params = useSearchParams();
 
   const initialService = useMemo(() => {
-    const v = params.get("service");
-    // Αντιστοίχιση του ID από το URL με το πλήρες όνομα της υπηρεσίας
-    if (v === "social") return "Social Media Management";
+const v = params?.get("service");    if (v === "social") return "Social Media Management";
     if (v === "content") return "Content Creation (Video & Photo)";
     if (v === "video") return "Video Editing";
     if (v === "web") return "Web Design & Development";
@@ -109,11 +107,12 @@ export default function ContactForm() {
       setStatus("success");
       setForm({ fullName: "", email: "", phone: "", service: "", message: "" });
       setTouched({});
-    } catch (err: any) {
-      console.error("submit failed:", err?.message);
-      setStatus("error");
-      setError(err?.message || "Κάτι πήγε στραβά. Δοκίμασε ξανά.");
-    }
+   } catch (error) {
+        const err = error as Error;
+        console.error("submit failed:", err.message);
+        setStatus("error");
+        setError(err.message || "Κάτι πήγε στραβά. Δοκίμασε ξανά.");
+      }
   }
 
   // Styles για τα Inputs (επαναχρησιμοποιούμενα)
